@@ -36,7 +36,8 @@ VALUES (%s, %s, %s, %s, %s, %s, %s);
 
 select_from_intraday = \
 '''
-SELECT date_time, close, volume FROM {symbol}_Intraday ORDER BY date_time DESC;
+SELECT date_time, high, low, close, volume FROM {symbol}_Intraday
+WHERE date_time >= '{start}' ORDER BY date_time;
 '''
 
 # ===========================================================
@@ -66,7 +67,8 @@ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
 
 select_from_daily = \
 '''
-SELECT date_string, adjusted_close, volume FROM {symbol}_Daily ORDER BY date_string DESC;
+SELECT date_string, high, low, close, adjusted_close, volume FROM {symbol}_Daily
+WHERE date_string >= '{start}' ORDER BY date_string;
 '''
 
 # ===========================================================
@@ -96,7 +98,7 @@ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s);
 select_from_stock_news = \
 '''
 SELECT date_time, title, content, sentiment FROM Stock_News 
-WHERE symbol = {symbol} ORDER BY date_time DESC;
+WHERE symbol = '{symbol}' AND date_time >= '{start}' ORDER BY date_time;
 '''
 
 
@@ -188,18 +190,33 @@ class Database(object):
 
 
     @classmethod
-    def get_data_intraday(cls, db: str, symbol: str):
-        return cls._get_data(db, select_from_intraday.format(symbol=symbol))
+    def get_data_intraday(cls, db: str, symbol: str, start: str = '1900-01-01'):
+        return cls._get_data(db, select_from_intraday.format(symbol=symbol, start=start))
 
 
     @classmethod
-    def get_data_daily(cls, db: str, symbol: str):
-        return cls._get_data(db, select_from_daily.format(symbol=symbol))
+    def get_data_daily(cls, db: str, symbol: str, start: str = '1900-01-01'):
+        return cls._get_data(db, select_from_daily.format(symbol=symbol, start=start))
 
 
     @classmethod
-    def get_data_news(cls, db: str, symbol: str):
-        return cls._get_data(db, select_from_stock_news.format(symbol=symbol))
+    def get_data_news(cls, db: str, symbol: str, start: str = '1900-01-01'):
+        return cls._get_data(db, select_from_stock_news.format(symbol=symbol, start=start))
+
+
+def retrieve_price_news(start: str = '1900-01-01') -> tuple:
+    '''Get market news, and daily price/volume and news for all symbols'''
+
+    db, symbols = db_init['db'], db_init['symbols']
+
+    market_news = Database.get_data_news(db, 'Market', start=start)
+    data = {symbol: {} for symbol in symbols}
+
+    for symbol in symbols:
+        data[symbol]['daily'] = Database.get_data_daily(db, symbol, start=start)
+        data[symbol]['news'] = Database.get_data_news(db, symbol, start=start)
+
+    return market_news, data
 
 
 def main():

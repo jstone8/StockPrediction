@@ -220,7 +220,7 @@ def main():
     gen_news = StockNews.prc_data(gen_news, trim_to_date=today, db=db)
 
     print('Insert {0} rows into the news table'.format(len(gen_news)))
-    print('Complete collection of general market news. Sleep for 10s.')
+    print('Complete collection of general market news')
     print()
     time.sleep(10)
 
@@ -229,9 +229,9 @@ def main():
         sym_news = StockNews.prc_data(sym_news, trim_to_date=today, db=db)
         
         print('Insert {0} rows into Stock_News'.format(len(sym_news)))
-        print('Complete collection of {0} news. Sleep for 10s'.format(symbol))
+        print('Complete collection of {0} news'.format(symbol))
         print()
-        time.sleep(10)
+        if symbol != symbols[-1]: time.sleep(10)
     
     for symbol in symbols:
         outputsize, interval = 'compact', '15min'
@@ -242,9 +242,9 @@ def main():
         
         print('Insert {0} rows into {1}.{2}_Intraday'.format(len(sp.intraday_ts), db, symbol))
         print('Insert {0} rows into {1}.{2}_Daily'.format(len(sp.daily_ts), db, symbol))
-        print('Complete collection of {0} price. Sleep for 30s'.format(symbol))
+        print('Complete collection of {0} price'.format(symbol))
         print()
-        time.sleep(30)
+        if symbol != symbols[-1]: time.sleep(30)
 
 
 if __name__ == '__main__':

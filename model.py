@@ -63,12 +63,6 @@ class Model(object):
             return [[0, 0, 0]]
 
 
-    def predict(self, X):
-        logger.info('Modeling - predict for %s', self.symbol)
-
-        return self._clf.predict(X)
-
-
 def load_feature(symbol: str) -> pd.DataFrame:
     ta_file = _data_folder + '{0}_ta.csv'.format(symbol)
     symbol_news_file = _data_folder + '{0}_news.csv'.format(symbol)
@@ -82,7 +76,8 @@ def load_feature(symbol: str) -> pd.DataFrame:
                                     how='left', lsuffix='_s', rsuffix='_m')
     feature = ta_feature.join(news_feature, on='date', how='left')
 
-    assert not feature.isnull().values.any(), 'Feature matrix contains NaN'
+    if feature.isnull().values.any():
+        logger.warning('Feature matrix contains NaN: %s', symbol)
         
     # Move the 'adj_close' column to last
     adj_close = feature['adj_close']

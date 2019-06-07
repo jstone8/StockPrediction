@@ -223,18 +223,14 @@ def collect_data():
     gen_news = StockNews.get_general_market_news()
     gen_news = StockNews.prc_data(gen_news, trim_to_date=today, db=db)
 
-    print('Insert {0} rows into the news table'.format(len(gen_news)))
-    print('Complete collection of general market news')
-    print()
+    logger.info('Insert %d market news into the news table', len(gen_news))
     time.sleep(10)
 
     for symbol in symbols:
         sym_news = StockNews.get_ticker_news(symbol=symbol)
         sym_news = StockNews.prc_data(sym_news, trim_to_date=today, db=db)
         
-        print('Insert {0} rows into Stock_News'.format(len(sym_news)))
-        print('Complete collection of {0} news'.format(symbol))
-        print()
+        logger.info('Insert %d %s news into the news table', len(sym_news), symbol)
         if symbol != symbols[-1]: time.sleep(10)
     
     for symbol in symbols:
@@ -244,10 +240,8 @@ def collect_data():
         sp.get_daily_adjusted()
         sp.prc_data(trim_to_date=today, db=db)
         
-        print('Insert {0} rows into {1}.{2}_Intraday'.format(len(sp.intraday_ts), db, symbol))
-        print('Insert {0} rows into {1}.{2}_Daily'.format(len(sp.daily_ts), db, symbol))
-        print('Complete collection of {0} price'.format(symbol))
-        print()
+        logger.info('Insert %d rows into %s.%s_Intraday', len(sp.intraday_ts), db, symbol)
+        logger.info('Insert %d rows into %s.%s_Daily', len(sp.daily_ts), db, symbol)
         if symbol != symbols[-1]: time.sleep(30)
 
     logger.info('Complete data collection')

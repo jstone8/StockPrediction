@@ -108,7 +108,7 @@ def update_fund():
             data = Database.get_data_daily(db=db, symbol=symbol, start=last_trade_day)[0]
             curr_open[symbol], curr_close[symbol] = float(data[1]), float(data[4])
 
-        # Buy shares at the open price
+        # Buy/sell shares at the open price
         for symbol in symbols:
             cash -= (curr_share[symbol] - last_share[symbol]) * curr_open[symbol]
 

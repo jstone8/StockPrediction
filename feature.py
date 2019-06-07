@@ -67,6 +67,7 @@ def build_ta_feature(symbol: str, daily: Sequence[tuple],
        @param: daily: daily time series data for a symbol
        @param: save_feature: whether to save the features to file
     '''
+    logger.info('Build ta feature for: %s. Last date: %s', symbol, daily[-1][0])
 
     col_dtype = {'date': object, 'open': 'float64', 'high': 'float64', 'low': 'float64',
                  'close': 'float64', 'adj_close': 'float64', 'volume': 'int32'}
@@ -115,9 +116,12 @@ def build_news_feature_all(symbol: str, trade_days: Tuple[str], news_data: Seque
        @param: news_data: collection of news. Timestamp of the news must be in ascending order
        @param: save_feature: whether to save the features to file
     '''
+    logger.info('Build news feature for %s, from %s to %s', symbol, trade_days[0], trade_days[-1])
 
-    assert list(trade_days) == sorted(list(trade_days)), 'Trade days not in ascending order'
-    assert news_data == sorted(news_data, key = lambda x: x[0]), 'News not in ascending order'
+    if not list(trade_days) == sorted(list(trade_days)):
+        logger.error('Trade days not in ascending order')
+    if news_data != sorted(news_data, key = lambda x: x[0]):
+        logger.error('News not ordered by date')
     
     news_feature, idx = [], 0
 
@@ -154,6 +158,7 @@ def build_feature_all(symbols: Sequence[str] = ()):
        
        @param: symbols: sequence of symbols to build feature. If empty, use all symbols
     '''
+    logger.info('Called')
 
     market_news, symbol_data = retrieve_price_news(symbols=symbols, start=_since_this_date)
 
@@ -172,12 +177,15 @@ def build_feature_all(symbols: Sequence[str] = ()):
 
 def update_ta_feature(symbol: str):
     '''Update ta features for the specified symbol with the latest daily time series data'''
+    logger.info('Called for %s', symbol)
 
     db = db_init['db']
 
     last_trade_day = Database.get_last_trade_day(db, symbol)
     last_ta_line = get_last_line(_data_folder + '{0}_ta.csv'.format(symbol))
     last_ta_day = last_ta_line.split(',')[0]
+
+    logger.info('Last trade day: %s, last ta day: %s', last_trade_day, last_ta_day)
 
     if last_ta_day < last_trade_day:
         data = Database.get_data_daily(db, symbol, start=_since_this_date)
@@ -188,6 +196,7 @@ def update_news_feature(symbol: str):
     '''Update mews features for the specified symbol with the latest news data.
        Should be used on a daily basis
     '''
+    logger.info('Called for %s', symbol)
 
     db, symbols = db_init['db'], db_init['symbols']
 
@@ -196,17 +205,28 @@ def update_news_feature(symbol: str):
     else:
         last_trade_day = Database.get_last_trade_day(db, symbol)
     
+    # Get news data and build feature for the last trade day
     news = Database.get_data_news(db, symbol, start=last_trade_day)
     news_feature = build_news_feature(last_trade_day, news)
 
+    from_date, to_date = (news[0][0], news[-1][0]) if len(news) > 0 else ('-', '-')
+    logger.info('Get %d news, from %s to %s', len(news), from_date, to_date)
+
+    # Get the date for the last news feature in file to determine whether the
+    # newly built news feature should override the existing one or simply append
     new_feature_file = _data_folder + '{0}_news.csv'.format(symbol)
     last_news_line = get_last_line(new_feature_file)
     last_news_day = last_news_line.split(',')[0]
 
-    assert last_news_day <= last_trade_day
+    logger.info('Last trade day: %s, last news day: %s', last_trade_day, last_news_day)
+    if last_news_day > last_trade_day:
+        logger.error('Unexpected behavior for last trade and news date')
 
     if last_news_day == last_trade_day:
+        logger.info('Override the news feature for %s', last_news_day)
         pop_last_line(new_feature_file)
+    else:
+        logger.info('Add the news feature for %s', last_news_day)
 
     with open(new_feature_file, 'a') as f:
         f.write(','.join(map(str, news_feature)) + '\n')

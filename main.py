@@ -24,7 +24,7 @@ def main():
     logging.info('Running main function')
 
     #collect_data()
-    #update_feature()
+    update_feature()
     trade()
 
     logging.info('Complete main function')

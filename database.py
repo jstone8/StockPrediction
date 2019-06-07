@@ -5,6 +5,8 @@ import mysql.connector
 from typing import Sequence, List, Tuple, Dict
 from config import access_credential, db_init
 
+logger = logging.getLogger(__name__)
+
 
 #############################################################
 # SQL Statements
@@ -36,7 +38,7 @@ VALUES (%s, %s, %s, %s, %s, %s, %s);
 
 select_from_intraday = \
 '''
-SELECT date_time, high, low, close, volume FROM {symbol}_Intraday
+SELECT date_time, open, high, low, close, volume FROM {symbol}_Intraday
 WHERE date_time >= '{start}' ORDER BY date_time;
 '''
 
@@ -67,7 +69,7 @@ VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);
 
 select_from_daily = \
 '''
-SELECT date_string, high, low, close, adjusted_close, volume FROM {symbol}_Daily
+SELECT date_string, open, high, low, close, adjusted_close, volume FROM {symbol}_Daily
 WHERE date_string >= '{start}' ORDER BY date_string;
 '''
 
@@ -99,6 +101,12 @@ select_from_stock_news = \
 '''
 SELECT date_time, title, content, sentiment FROM Stock_News 
 WHERE symbol = '{symbol}' AND date_time >= '{start}' ORDER BY date_time;
+'''
+
+# ===========================================================
+select_last_trade_day = \
+'''
+SELECT MAX(date_string) FROM {symbol}_Daily
 '''
 
 
@@ -182,7 +190,6 @@ class Database(object):
         cursor.execute(sql)
         data = cursor.fetchall()
 
-        connect.commit()
         cursor.close()
         connect.close()
 
@@ -204,10 +211,21 @@ class Database(object):
         return cls._get_data(db, select_from_stock_news.format(symbol=symbol, start=start))
 
 
-def retrieve_price_news(start: str = '1900-01-01') -> tuple:
-    '''Get market news, and daily price/volume and news for all symbols'''
+    @classmethod
+    def get_last_trade_day(cls, db: str, symbol: str) -> str:
+        return cls._get_data(db, select_last_trade_day.format(symbol=symbol))[0][0]
 
-    db, symbols = db_init['db'], db_init['symbols']
+
+def retrieve_price_news(db: str = '', symbols: Sequence[str] = (), 
+                        start: str = '1900-01-01') -> tuple:
+    '''Get market news, and daily price/volume and news for all symbols
+       
+       @param: start: retrieve data since this date
+       @param: symbols: sequence of symbols to retrieve data. If empty, use all symbols
+    '''
+
+    if not db: db = db_init['db']
+    if not symbols: symbols = db_init['symbols']
 
     market_news = Database.get_data_news(db, 'Market', start=start)
     data = {symbol: {} for symbol in symbols}

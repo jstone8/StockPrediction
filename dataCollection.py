@@ -9,6 +9,8 @@ from database import Database
 from config import api_keys, db_init
 from util import standardize_datetime, validate_date_fmt
 
+logger = logging.getLogger(__name__)
+
 
 def _build_url(base_url: str, params: dict) -> str:
     return base_url + '&'.join(['{0}={1}'.format(key, params[key]) for key in params])
@@ -212,7 +214,9 @@ class StockNews(object):
         return value_list
 
 
-def main():
+def collect_data():
+    logger.info('Start data collection')
+
     db, symbols = db_init['db'], db_init['symbols']
     today = datetime.today().strftime('%Y-%m-%d')
     
@@ -246,6 +250,9 @@ def main():
         print()
         if symbol != symbols[-1]: time.sleep(30)
 
+    logger.info('Complete data collection')
+
 
 if __name__ == '__main__':
-    main()
+    # collect_data()
+    pass

@@ -54,13 +54,17 @@ class Model(object):
             self._clf.fit(self.dataX, self.dataY)
 
     
-    def predict_proba(self, X):
-        logger.info('Modeling - predict prob for %s', self.symbol)
-
-        try:
-            return self._clf.predict_proba(X)
-        except:
-            return [[0, 0, 0]]
+    def predict_proba(self):
+        if len(self.dataX_today) > 0:
+            prob = self._clf.predict_proba(self.dataX_today)[0]
+            # In case of binary classes
+            if len(prob) == 2: prob = [prob[0], 0, prob[1]]
+        else:
+            prob = [0, 0, 0]
+        
+        logger.info('Modeling - predict prob for %s: %s', 
+                    self.symbol, ', '.join(map('{:.2f}'.format, prob)))
+        return prob
 
 
 def load_feature(symbol: str) -> pd.DataFrame:
@@ -92,7 +96,7 @@ def main():
     model.load_data()
     model.fit()
     
-    prob = model.predict_proba(model.dataX_today)[0]
+    prob = model.predict_proba()
     print(prob)
 
 

@@ -29,6 +29,7 @@ def build_news_feature(date_string: str, news: Sequence[tuple]) -> tuple:
     col_names = ('date_time', 'title', 'content', 'sentiment')
 
     df = pd.DataFrame(news, columns=col_names, dtype=object)
+    df.fillna('', inplace=True)
     df['title_score'] = df['title'].map(lambda x: analyzer.polarity_scores(x)['compound'])
     df['content_score'] = df['content'].map(lambda x: analyzer.polarity_scores(x)['compound'])
 
@@ -67,7 +68,7 @@ def build_ta_feature(symbol: str, daily: Sequence[tuple],
        @param: daily: daily time series data for a symbol
        @param: save_feature: whether to save the features to file
     '''
-    logger.info('Build ta feature for: %s. Last date: %s', symbol, daily[-1][0])
+    logger.info('Build ta feature for: %s. Last daily date: %s', symbol, daily[-1][0])
 
     col_dtype = {'date': object, 'open': 'float64', 'high': 'float64', 'low': 'float64',
                  'close': 'float64', 'adj_close': 'float64', 'volume': 'int32'}
@@ -226,7 +227,7 @@ def update_news_feature(symbol: str):
         logger.info('Override the news feature for %s', last_news_day)
         pop_last_line(new_feature_file)
     else:
-        logger.info('Add the news feature for %s', last_news_day)
+        logger.info('Add the news feature for %s', last_trade_day)
 
     with open(new_feature_file, 'a') as f:
         f.write(','.join(map(str, news_feature)) + '\n')
@@ -249,4 +250,5 @@ def update_feature():
 
 if __name__ == '__main__':
     # update_feature()
-    pass
+    build_feature_all()
+    

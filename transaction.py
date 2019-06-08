@@ -12,16 +12,17 @@ logger = logging.getLogger(__name__)
 
 _data_folder = './data/transaction/'
 _transaction_file = _data_folder + 'transaction.csv'
+_prob_pred_file = _data_folder + 'prob_pred.csv'
 
 
 def init_transaction():
     db, symbols = db_init['db'], db_init['symbols']
 
-    total_value = 1000000     # Initial total amount of fund
-    value_each_stock = 10000  # Own approximate this value of shares for each stock
+    total_value = 500000      # Initial total amount of fund
+    value_each_stock = 25000  # Own approximate this value of shares for each stock
 
     open_, close = {}, {}     # Open and close price for each stock today
-    today = '2019-06-04'      # datetime.today().strftime('%Y-%m-%d')
+    today = '2019-05-31'      # datetime.today().strftime('%Y-%m-%d')
 
     for symbol in symbols:
         data = Database.get_data_daily(db=db, symbol=symbol, start=today)[0]
@@ -33,11 +34,15 @@ def init_transaction():
     header = ['date'] + [symbol + t for symbol in symbols for t in ['_share', '_open', '_close']]
     header += ['cash', 'total_value']
     values = [today] + [v for symbol in symbols for v in [share[symbol], open_[symbol], close[symbol]]]
-    values += [cash, total_value]
+    values += [round(cash, 4), round(total_value, 4)]
 
     with open(_transaction_file, 'w') as f:
-        f.write(','.join(map(str, header)) + '\n')
+        f.write(','.join(header) + '\n')
         f.write(','.join(map(str, values)) + '\n')
+
+    with open(_prob_pred_file, 'w') as f:
+        header = ['date'] + [symbol + t for symbol in symbols for t in ['_neg', '_neu', '_pos']]
+        f.write(','.join(header) + '\n')
 
 
 def _validate_cash():
@@ -96,7 +101,7 @@ def update_fund():
         logger.error('Unexpected behavior for last trade and transaction date')
 
     # New daily price data is available to finalize the transaction
-    if last_trade_day > last_transaction[0]:
+    if last_trade_day > last_transaction[0] and curr_transaction[0] == 'NA':
         logger.info('Finalize transaction for: %s', last_trade_day)
 
         last_share = {s: int(v) for s, v in zip(symbols, last_transaction[1:-2:3])}
@@ -121,6 +126,13 @@ def update_fund():
             curr_transaction += [curr_share[symbol], curr_open[symbol], curr_close[symbol]]
         curr_transaction += [round(cash, 4), round(total, 4)]
 
+        # Update the date for the probability predictions made for this day
+        prob_pred = pop_last_line(_prob_pred_file).split(',')
+        prob_pred[0] = last_trade_day
+
+        with open(_prob_pred_file, 'a') as f:
+            f.write(','.join(map(str, prob_pred)) + '\n')
+
     with open(_transaction_file, 'a') as f:
         f.write(','.join(map(str, curr_transaction)) + '\n')
 
@@ -140,22 +152,27 @@ def make_trade_decision():
     init_share = get_init_share()
     line = get_last_line(_transaction_file).split(',')
     
-    if line[0] == 'NA':    # This transaction is not finalized
+    # If the transaction has not been finalized, update the probability predictions
+    # as well as the current trading decisions
+    if line[0] == 'NA':
         logger.info('Update the current trading decision')
         
         pop_last_line(_transaction_file)
+        pop_last_line(_prob_pred_file)
         line = get_last_line(_transaction_file).split(',')
 
         logger.info('Last transaction data retrieved: %s', line[0])
 
     curr_share = {s: int(v) for s, v in zip(symbols, line[1:-2:3])}
+    prob_pred = {}
 
     for symbol in symbols:
         model = Model(symbol)
         model.load_data()
         model.fit()
         
-        neg, neu, pos = model.predict_proba(model.dataX_today)[0]
+        neg, neu, pos = model.predict_proba()
+        prob_pred[symbol] = tuple(map(lambda x: round(x, 4), (neg, neu, pos)))
 
         # A simple strategy
         transaction = int(round(init_share[symbol] * (pos - neg) / 2, 0))
@@ -175,6 +192,12 @@ def make_trade_decision():
     with open(_transaction_file, 'a') as f:
         f.write(','.join(map(str, values)) + '\n')
 
+    # Log probability predictions for the next trading day
+    prob = ['NA'] + [v for symbol in symbols for v in prob_pred[symbol]]
+
+    with open(_prob_pred_file, 'a') as f:
+        f.write(','.join(map(str, prob)) + '\n')
+
 
 def trade():
     logger.info('Start trading process')
@@ -186,5 +209,4 @@ def trade():
 
 
 if __name__ == '__main__':
-    # trade()
     pass

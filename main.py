@@ -23,9 +23,12 @@ logging.basicConfig(**log_param)
 def main():
     logging.info('Running main function')
 
-    #collect_data()
-    update_feature()
-    trade()
+    try:
+        collect_data()
+        update_feature()
+        trade()
+    except:
+        logging.exception('Critical error occurs')
 
     logging.info('Complete main function')
 

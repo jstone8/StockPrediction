@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Quantstone</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="style.css">
+</head>
+
+<body>
+<div class="row">
+    <div class="header">
+        <div class="topnav">
+            <a href="#" class="selected">Portfolios</a>
+            <a href="#">Forecast</a>
+        </div>
+
+        <div class="info">
+            <a href="#"><i class="fas fa-user user"></i>Welcome</a>
+            <a href="#"><i class="fas fa-envelope contact"></i>Contact</a>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div class="row">
+    <div class="first-row left column">
+        <div>
+            <table class="portfolio">
+                <colgroup>
+                    <col class="col-10">
+                    <col class="col-45">
+                    <col class="col-15">
+                    <col class="col-30">
+                </colgroup>
+
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Portfolio Name</th>
+                        <th>Size</th> 
+                        <th>Total Value</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+        <div class="scroll-portfolio">
+            <table class="portfolio">
+                <colgroup>
+                    <col class="col-10">
+                    <col class="col-45">
+                    <col class="col-15">
+                    <col class="col-30">
+                </colgroup>
+
+                <tbody>
+                    <tr>
+                        <td>10</td>
+                        <td>Sample Portfolio with long name</td>
+                        <td>10</td> 
+                        <td>$500,000<i class="fas fa-info-circle"></i></td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Sample Portfolio</td>
+                        <td>10000000000</td> 
+                        <td>$500,000<i class="fas fa-info-circle"></i></td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Sample Portfolio</td>
+                        <td>10</td> 
+                        <td>$500,000,000,000,000<i class="fas fa-info-circle"></i></td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Sample Portfolio</td>
+                        <td>10</td> 
+                        <td>$500,000<i class="fas fa-info-circle"></i></td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Sample Portfolio</td>
+                        <td>10</td> 
+                        <td>$500,000<i class="fas fa-info-circle"></i></td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Sample Portfolio</td>
+                        <td>10</td> 
+                        <td>$500,000<i class="fas fa-info-circle"></i></td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Sample Portfolio</td>
+                        <td>10</td> 
+                        <td>$500,000<i class="fas fa-info-circle"></i></td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Sample Portfolio</td>
+                        <td>10</td> 
+                        <td>$500,000<i class="fas fa-info-circle"></i></td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>Sample Portfolio</td>
+                        <td>10</td> 
+                        <td>$500,000<i class="fas fa-info-circle"></i></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div>
+            <input type="text", placeholder="Seach Portfolio">
+            <button><i class="fas fa-plus"></i>New</button>
+        </div>
+    </div>
+    
+    <div class="first-row right column">
+        <div class="button-group">
+            <div class="large-button">Holdings</div>
+            <div class="large-button">Transactions</div>
+            <div class="right-button">
+                <button><i class="fas fa-plus"></i>Add Position</button>
+                <button><i class="far fa-edit"></i>Edit Position</button>
+            </div>
+        </div>
+
+        <div class="table-title">
+            <div>Sample Portfolio</div>
+        </div>
+
+        <div>
+            <table class="holdings">
+                <colgroup>
+                    <col class="col-05">
+                    <col class="col-10">
+                    <col class="col-20">
+                    <col class="col-10">
+                    <col class="col-10">
+                    <col class="col-20">
+                    <col class="col-15">
+                    <col class="col-10">
+                </colgroup>
+
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Symbol</th>
+                        <th>Description</th> 
+                        <th>Shares</th>
+                        <th class="right-align-text">Price</th>
+                        <th class="right-align-text">Daily Change</th>
+                        <th class="right-align-text">Value</th>
+                        <th class="right-align-text">Weight %</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+        <div class="scroll-holdings">
+            <table class="holdings">
+                <colgroup>
+                    <col class="col-05">
+                    <col class="col-10">
+                    <col class="col-20">
+                    <col class="col-10">
+                    <col class="col-10">
+                    <col class="col-20">
+                    <col class="col-15">
+                    <col class="col-10">
+                </colgroup>
+
+                <tbody>
+                    <tr>
+                        <td>10</td>
+                        <td>AMZN</td>
+                        <td>Amazon.com, Inc. Amazon.com, Inc.</td> 
+                        <td>105</td>
+                        <td class="right-align-text">1804.05</td>
+                        <td class="right-align-text">+50.56 <sup>(2.56%)<i class="fas fa-arrow-up"></i></sup></td>
+                        <td class="right-align-text">$25,000.56</td>
+                        <td class="right-align-text">10.00%</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>AMZN</td>
+                        <td>Amazon.com, Inc.</td> 
+                        <td>50</td>
+                        <td class="right-align-text">1804.05</td>
+                        <td class="right-align-text">+150.56 <sup>(2.56%)<i class="fas fa-arrow-up"></i></sup></td>
+                        <td class="right-align-text">$5,000.56</td>
+                        <td class="right-align-text">10.00%</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>AMZN</td>
+                        <td>Amazon.com, Inc.</td> 
+                        <td>5</td>
+                        <td class="right-align-text">1804.05</td>
+                        <td class="right-align-text">+50.56 <sup>(2.56%)<i class="fas fa-arrow-up"></i></sup></td>
+                        <td class="right-align-text">$25,000.56</td>
+                        <td class="right-align-text">5.00%</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>AMZN</td>
+                        <td>Amazon.com, Inc.</td> 
+                        <td>5</td>
+                        <td class="right-align-text">1804.05</td>
+                        <td class="right-align-text">+50.56 <sup>(2.56%)<i class="fas fa-arrow-up"></i></sup></td>
+                        <td class="right-align-text">$25,000.56</td>
+                        <td class="right-align-text">10.00%</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>AMZN</td>
+                        <td>Amazon.com, Inc.</td> 
+                        <td>5</td>
+                        <td class="right-align-text">1804.05</td>
+                        <td class="right-align-text">+150.56 <sup>(2.56%)<i class="fas fa-arrow-up"></i></sup></td>
+                        <td class="right-align-text">$25,000.56</td>
+                        <td class="right-align-text">10.00%</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>AMZN</td>
+                        <td>Amazon.com, Inc. Amazon.com, Inc.</td> 
+                        <td>5</td>
+                        <td class="right-align-text">1804.05</td>
+                        <td class="right-align-text">+50.56<sup>(2.56%)<i class="fas fa-arrow-up"></i></sup></td>
+                        <td class="right-align-text">$25,000.56</td>
+                        <td class="right-align-text">10.00%</td>
+                    </tr>
+                    <tr>
+                        <td>10</td>
+                        <td>AMZN</td>
+                        <td>Amazon.com, Inc. Amazon.com, Inc.</td> 
+                        <td>5</td>
+                        <td class="right-align-text">1804.05</td>
+                        <td class="right-align-text">+50.56<sup>(2.56%)<i class="fas fa-arrow-up"></i></sup></td>
+                        <td class="right-align-text">$25,000.56</td>
+                        <td class="right-align-text">10.00%</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <div>
+            <table class="holdings">
+                <colgroup>
+                    <col class="col-05">
+                    <col class="col-10">
+                    <col class="col-20">
+                    <col class="col-10">
+                    <col class="col-10">
+                    <col class="col-20">
+                    <col class="col-15">
+                    <col class="col-10">
+                </colgroup>
+
+                <thead>
+                    <tr>
+                        <td colspan="6">Cash</td>
+                        <td class="right-align-text">$25,000.56</td>
+                        <td class="right-align-text">45.90%</td>
+                    </tr>
+                    <tr id="total-value">
+                        <td colspan="5">
+                            Total Value<i class="fas fa-info-circle"></i>
+                        </td>
+                        <td class="right-align-text">+50.56 <sup>(2.56%)<i class="fas fa-arrow-up"></i></sup></td>
+                        <td class="right-align-text">$50,000.56<sup></sup></td>
+                        <td><sup>(2.45%)<i class="fas fa-arrow-up"></i><sup></td>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="second-row left column">
+        <div>
+            <table class="statistics">
+                <caption>Portfolio Statistics</caption>
+
+                <colgroup>
+                    <col class=".col-50">
+                    <col class=".col-50">
+                </colgroup>
+
+                <thead>
+                    <tr>
+                        <th>Attribute</th>
+                        <th class="right-align-text">Value</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>Sharp</td>
+                        <td class="right-align-text">0.05</td>
+                    </tr>
+                    <tr>
+                        <td>Volatility</td>
+                        <td class="right-align-text">0.95%</td>
+                    </tr>
+                    <tr>
+                        <td>Beta</td>
+                        <td class="right-align-text">0.45</td>
+                    </tr>
+                    <tr>
+                        <td>1yr High</td>
+                        <td class="right-align-text">$50,500.56</td>
+                    </tr>
+                    <tr>
+                        <td>1yr Low</td>
+                        <td class="right-align-text">$49,300.56</td>
+                    </tr>
+                    <tr>
+                        <td>Daily Change</td>
+                        <td class="right-align-text">$5,000.34<i class="fas fa-arrow-up"></i></td>
+                    </tr>
+                    <tr>
+                        <td>% Daily Change</td>
+                        <td class="right-align-text">4.65%<i class="fas fa-arrow-up"></i></td>
+                    </tr>
+                    <tr>
+                        <td>WTD Return</td>
+                        <td class="right-align-text">1.34%<i class="fas fa-arrow-up"></i></td>
+                    </tr>
+                    <tr>
+                        <td>MTD Return</td>
+                        <td class="right-align-text">1.45%<i class="fas fa-arrow-up"></i></td>
+                    </tr>
+                    <tr>
+                        <td>QTD Return</td>
+                        <td class="right-align-text">1.42%<i class="fas fa-arrow-up"></i></td>
+                    </tr>
+                    <tr>
+                        <td>YTD Return</td>
+                        <td class="right-align-text">0.59%<i class="fas fa-arrow-up"></i></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id= "plot" class="second-row right column"></div>
+</div>
+
+<hr>
+
+<div class="footer">
+    <div class="copyright">&copy; 2019 by J. Shi. All Rights Reserved.</div>
+    <div class="timestamp">Updated: 2019-06-01 18:00:00 -0400</div>
+</div>
+
+</body>
+</html>

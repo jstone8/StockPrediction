@@ -1,0 +1,314 @@
+::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-size: 12px;
+    font-family: "Helvetica Neue", Helvetica, Arial , sans-serif;
+    color: #eeeeee;
+    background-color: #232D38;
+    margin: 10px 15px;
+}
+
+.row {
+    margin-bottom: 20px;
+}
+
+.row:after, .button-group:after {
+    content: "";
+    display: table;
+    clear: both;
+}
+
+.topnav {
+    display: inline-block;
+    overflow: visible;
+    font-size: 18px;
+    border: 1px solid #06070A;
+    border-radius: 6px;
+}
+
+.topnav a {
+    display: block;
+    float: left;
+    color: #f9f9f9;
+    text-align: center;
+    font-weight: bold;
+    padding: 6px 14px;
+    border-radius: 4px;
+    background: linear-gradient(to bottom, #2A3142, #171B25);
+    text-decoration: none;
+}
+
+.topnav a:hover, .topnav .selected, button:hover {
+    background: none;
+    background-color: #e47627;
+    cursor: pointer;
+}
+
+.info {
+    display: inline-block;
+    overflow: visible;
+    float: right;
+    font-size: 16px;
+}
+
+.info a {
+    display: inline-block;
+    color: #eeeeee;
+    font-weight: bold;
+    margin-left: 12px;
+    text-decoration: none;
+}
+
+.info a:hover {
+    text-decoration: underline;
+}
+
+.info i {
+    padding: 10px 6px;
+}
+
+hr {
+    border: 1px solid #c5c5c5;
+}
+
+.column {
+    float: left;
+    border: 1px solid #000000;
+    border-radius: 6px;
+}
+
+.left {
+    width: 28%;
+    padding: 10px;
+    background-color: #3F4757;
+}
+
+.right {
+    width: 72%;
+    padding: 0 0 0 25px; 
+}
+
+.first-row {
+    height: 280px;
+    margin-top: 10px;
+}
+
+table {
+    width: 100%;
+    table-layout: fixed;
+    border-collapse: collapse;
+    border-spacing: 0px;
+}
+
+tbody tr:hover {
+    background-color: #e47627;
+}
+
+th, td {
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+caption, th {
+    font-size: 14px;
+    font-weight: bold;
+}
+
+table i {
+    padding-left: 8px;
+}
+
+table i:hover {
+    cursor: pointer;
+}
+
+.right-align-text {
+    text-align: right;
+}
+
+.col-05 {
+    width: 5%;
+}
+
+.col-10 {
+    width: 10%;
+}
+
+.col-15 {
+    width: 15%;
+}
+
+.col-20 {
+    width: 20%;
+}
+
+.col-25 {
+    width: 25%;
+}
+
+.col-30 {
+    width: 30%;
+}
+
+.col-35 {
+    width: 35%;
+}
+
+.col-40 {
+    width: 40%;
+}
+
+.col-45 {
+    width: 45%;
+}
+
+.col-50 {
+    width: 50%;
+}
+
+.scroll-portfolio {
+    height: 190px;
+    overflow-y: auto;
+    border-top: 2px solid #888888;
+    border-bottom: 2px solid #888888;
+    padding: 6px 0;
+    margin-bottom: 15px;
+}
+
+.portfolio th, .portfolio td {
+    padding: 6px 4px;
+}
+
+input {
+    width: 150px;
+    height: 25px;
+    border: 1px solid #cccccc;
+    border-radius: 2px;
+    padding: 0 4px;
+}
+
+button {
+    color: #eeeeee;
+    font-weight: bold;
+    border: 1px solid #06070A;
+    border-radius: 4px;
+    background: linear-gradient(to bottom, #2A3142, #171B25);
+    padding: 4px 8px;
+    margin-left: 10px;
+}
+
+button i {
+    padding-right: 5px;
+}
+
+.column button {
+    float: right;
+}
+
+.button-group {
+    display: flex;
+    align-items: center;
+}
+
+.button-group .right-button {
+    margin-left: auto;
+}
+
+.large-button {
+    display: inline-block;
+    float: left;
+    font-size: 14px;
+    background: linear-gradient(to bottom, #2A3142, #171B25);
+    border-radius: 6px;
+    padding: 15px;
+    margin-right: 6px;
+}
+
+.large-button:hover {
+    background-color: #678686;
+    cursor: pointer;
+}
+
+.table-title {
+    font-size: 16px;
+    font-weight: bold;
+    border: 1px solid #373C4B;
+    background: linear-gradient(to bottom, #2A3142, #171B25);
+    padding: 4px 3px;
+    margin-top: 6px;
+}
+
+.scroll-holdings {
+    height: 116px;
+    overflow-y: auto;
+    padding: 6px 0;
+    margin-bottom: 10px;
+}
+
+sup i {
+    padding-left: 4px;
+}
+
+.holdings th {
+    padding: 4px 4px;
+    border-bottom: 2px solid #888888;
+}
+
+.holdings td {
+    padding: 2px 4px;
+}
+
+#total-value {
+    font-size: 14px;
+    background: linear-gradient(to bottom, #5B8E00, #426700);
+}
+
+.second-row {
+    height: 300px;
+}
+
+.statistics th, td {
+    padding: 4px 30px;
+}
+
+.statistics th {
+    border-bottom: 1px solid #ffffff;
+}
+
+.statistics tbody tr:first-child td {
+    padding-top: 6px;
+}
+
+.statistics th:first-child, .statistics td:first-child {
+    border-right: 1px solid #ffffff;
+}
+
+.footer {
+    color: #999999;
+    padding-bottom: 15px;
+}
+
+.footer .copyright {
+    display: inline-block;
+    float: left;
+}
+
+.footer .timestamp {
+    display: inline-block;
+    float: right;
+}
+
+@media (max-width: 800px) {
+    .column {
+        width: 100%;
+    }
+}

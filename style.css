@@ -9,9 +9,9 @@
 
 body {
     font-size: 12px;
-    font-family: "Helvetica Neue", Helvetica, Arial , sans-serif;
-    color: #eeeeee;
-    background-color: #232D38;
+    font-family: helvetica, arial, sans-serif;
+    color: #d9d9d9;
+    background-color: #212a36;
     margin: 10px 15px;
 }
 
@@ -25,29 +25,27 @@ body {
     clear: both;
 }
 
-.topnav {
+.not-allowed:hover {
+    cursor: not-allowed !important;
+}
+
+.topnav div {
     display: inline-block;
-    overflow: visible;
-    font-size: 18px;
-    border: 1px solid #06070A;
-    border-radius: 6px;
-}
-
-.topnav a {
-    display: block;
     float: left;
-    color: #f9f9f9;
-    text-align: center;
+    overflow: visible;
+    color: #d9d9d9;
+    font-size: 18px;
     font-weight: bold;
+    text-align: center;
     padding: 6px 14px;
-    border-radius: 4px;
-    background: linear-gradient(to bottom, #2A3142, #171B25);
-    text-decoration: none;
+    border: 1px solid #050709;
+    border-radius: 2px;
+    background: linear-gradient(to bottom, #2a3142, #171b25);
 }
 
-.topnav a:hover, .topnav .selected, button:hover {
+.topnav .selected {
     background: none;
-    background-color: #e47627;
+    background-color: #d97223;
     cursor: pointer;
 }
 
@@ -60,7 +58,7 @@ body {
 
 .info a {
     display: inline-block;
-    color: #eeeeee;
+    color: #d9d9d9;
     font-weight: bold;
     margin-left: 12px;
     text-decoration: none;
@@ -87,12 +85,12 @@ hr {
 .left {
     width: 28%;
     padding: 10px;
-    background-color: #3F4757;
+    background-color: #3f4757;
 }
 
 .right {
     width: 72%;
-    padding: 0 0 0 25px; 
+    padding-left: 25px; 
 }
 
 .first-row {
@@ -108,7 +106,7 @@ table {
 }
 
 tbody tr:hover {
-    background-color: #e47627;
+    background-color: #32394a;
 }
 
 th, td {
@@ -118,7 +116,7 @@ th, td {
     text-overflow: ellipsis;
 }
 
-caption, th {
+th {
     font-size: 14px;
     font-weight: bold;
 }
@@ -129,6 +127,11 @@ table i {
 
 table i:hover {
     cursor: pointer;
+}
+
+.title {
+    font-size: 16px;
+    font-weight: bold;
 }
 
 .right-align-text {
@@ -175,13 +178,17 @@ table i:hover {
     width: 50%;
 }
 
-.scroll-portfolio {
+#scroll-portfolio {
     height: 190px;
     overflow-y: auto;
-    border-top: 2px solid #888888;
-    border-bottom: 2px solid #888888;
+    border-top: 1px solid #b1b1b1;
+    border-bottom: 1px solid #b1b1b1;
     padding: 6px 0;
     margin-bottom: 15px;
+}
+
+.portfolio th {
+    cursor: pointer;
 }
 
 .portfolio th, .portfolio td {
@@ -191,19 +198,20 @@ table i:hover {
 input {
     width: 150px;
     height: 25px;
-    border: 1px solid #cccccc;
+    border: 1px solid #b1b1b1;
     border-radius: 2px;
     padding: 0 4px;
 }
 
 button {
-    color: #eeeeee;
+    color: #d9d9d9;
     font-weight: bold;
-    border: 1px solid #06070A;
+    border: 1px solid #050709;
     border-radius: 4px;
-    background: linear-gradient(to bottom, #2A3142, #171B25);
+    background: linear-gradient(to bottom, #2a3142, #171b25);
     padding: 4px 8px;
     margin-left: 10px;
+    outline: none;
 }
 
 button i {
@@ -227,7 +235,7 @@ button i {
     display: inline-block;
     float: left;
     font-size: 14px;
-    background: linear-gradient(to bottom, #2A3142, #171B25);
+    background: linear-gradient(to bottom, #2a3142, #171b25);
     border-radius: 6px;
     padding: 15px;
     margin-right: 6px;
@@ -238,42 +246,85 @@ button i {
     cursor: pointer;
 }
 
-.table-title {
-    font-size: 16px;
-    font-weight: bold;
-    border: 1px solid #373C4B;
-    background: linear-gradient(to bottom, #2A3142, #171B25);
+#table-title {
+    border: 1px solid #373c4b;
+    background: linear-gradient(to bottom, #2a3142, #171b25);
     padding: 4px 3px;
     margin-top: 6px;
 }
 
-.scroll-holdings {
+#scroll-holdings {
     height: 116px;
     overflow-y: auto;
-    padding: 6px 0;
-    margin-bottom: 10px;
+    padding-top: 6px;
+    margin-bottom: 12px;
+}
+
+#transaction-history {
+    display: none;
+}
+
+#scroll-transactions {
+    height: 165px;
+    overflow-y: auto;
+    padding-top: 6px;
+    margin-bottom: 4px;
 }
 
 sup i {
     padding-left: 4px;
 }
 
-.holdings th {
+table .up {
+    color: #41a800;
+}
+
+table .down {
+    color: #c41223;
+}
+
+.holdings tbody tr:nth-child(even),
+.transactions tbody tr:nth-child(even) {
+    background-color: #1f1e2c;
+}
+
+.holdings tbody tr:hover,
+.transactions tbody tr:hover {
+    background-color: #131324 !important;
+}
+
+.holdings th, .transactions th {
     padding: 4px 4px;
-    border-bottom: 2px solid #888888;
+    border-bottom: 1px solid #b1b1b1;
+    cursor: pointer;
 }
 
 .holdings td {
-    padding: 2px 4px;
+    padding: 3px 4px;
+}
+
+.transactions td {
+    padding: 5px 4px;
 }
 
 #total-value {
     font-size: 14px;
-    background: linear-gradient(to bottom, #5B8E00, #426700);
+}
+
+.total-value-up  {
+    background-color: #417100;
+}
+
+.total-value-down {
+    background-color: #781416;
 }
 
 .second-row {
-    height: 300px;
+    height: 350px;
+}
+
+.statistics caption {
+    margin-bottom: 15px;
 }
 
 .statistics th, td {
@@ -281,16 +332,136 @@ sup i {
 }
 
 .statistics th {
-    border-bottom: 1px solid #ffffff;
+    border-bottom: 1px solid #cccccc;
 }
 
 .statistics tbody tr:first-child td {
-    padding-top: 6px;
+    padding-top: 10px;
 }
 
 .statistics th:first-child, .statistics td:first-child {
-    border-right: 1px solid #ffffff;
+    border-right: 1px solid #cccccc;
 }
+
+.chart text {
+    fill: #7f8faf;
+}
+
+.chart .chart-title text,
+.chart .time-info text {
+    font-weight: bold;
+    fill: #d9d9d9;
+}
+
+.chart .chart-title text {
+    font-size: 16px;
+}
+
+.chart .range-option rect {
+    fill: #171b25;
+}
+
+.chart .range-option text {
+    cursor: pointer;
+}
+
+.chart .range-option text:hover {
+    fill: #d97223;
+}
+
+.chart .overlay {
+    fill: none;
+    pointer-events: all;
+}
+
+.chart .line {
+    fill: none;
+    stroke-width: 2px;
+    clip-path: url("#clip");
+}
+
+.chart .benchmark-line,
+.chart .benchmark-tooltip circle {
+    stroke: #2980b9;
+}
+
+.chart .portfolio-line,
+.chart .portfolio-tooltip circle {
+    stroke: #a51214;
+}
+
+.chart .tooltip circle {
+    fill: #d3d3d3;
+    stroke-width: 2px;
+}
+
+.chart .hover-line {
+    stroke: #a4a4a4;
+    stroke-width: 1px;
+    stroke-dasharray: 3,3;
+}
+
+.hover-text {
+    position: absolute;
+    font-family: monospace, monospace;
+    white-space: nowrap;
+    border-radius: 8px;
+    background-color: #2f3747;
+    pointer-events: none;
+    padding: 4px;
+}
+
+.hover-text .dot {
+    display: inline-block;
+    height: 5px;
+    width: 5px;
+    margin: 0 5px 1px 8px;
+    border-radius: 50%;
+}
+
+.hover-text .benchmark-dot {
+    background-color: #2980b9;
+}
+
+.hover-text .portfolio-dot {
+    background-color: #a51214;
+}
+
+.chart .area {
+    fill: rgba(145, 156, 235, 0.2);
+    stroke: #3696cd;
+    clip-path: url("#clip");
+}
+
+.chart .brushX .extent {
+    stroke: #aaaaaa;
+    fill: #b4a6b3;
+    fill-opacity: 0.2;
+    shape-rendering: crispedges;
+}
+
+.chart .axis path, 
+.chart .axis line, 
+.chart .y-grid {
+    fill: none;
+    stroke: #e7eef4;
+    opacity: 0.3;
+    shape-rendering: crispedges;
+}
+
+.chart .axis-y .tick text {
+    text-anchor: end;
+}
+
+/*
+.chart .axis .axis-x .tick:nth-child(odd) {
+    display: none;
+}
+
+.chart .axis-y .tick line, .axis-y path {
+    display: none;
+}
+*/
 
 .footer {
     color: #999999;
@@ -310,5 +481,9 @@ sup i {
 @media (max-width: 800px) {
     .column {
         width: 100%;
+    }
+
+    .right {
+        padding: 0 10px;
     }
 }

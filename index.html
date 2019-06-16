@@ -4,21 +4,26 @@
     <title>Quantstone</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
+    
     <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
-    <link rel="stylesheet" type="text/css" href="style.css">
+    <link rel="stylesheet" type="text/css" href="./static/style.css?v=random53">
+    
+    <script src="http://d3js.org/d3.v3.min.js" defer></script>
+    <script src="./static/script.js?v=random53" defer></script>
+    <script src="./static/utils.js?v=random53" defer></script>
 </head>
 
 <body>
 <div class="row">
     <div class="header">
         <div class="topnav">
-            <a href="#" class="selected">Portfolios</a>
-            <a href="#">Forecast</a>
+            <div href="#" class="selected">Portfolios</div>
+            <div href="#" title="Coming soon" class="not-allowed">Forecast</div>
         </div>
 
         <div class="info">
             <a href="#"><i class="fas fa-user user"></i>Welcome</a>
-            <a href="#"><i class="fas fa-envelope contact"></i>Contact</a>
+            <a href="mailto:example@gmail.com"><i class="fas fa-envelope contact"></i>Contact</a>
         </div>
     </div>
 </div>
@@ -47,7 +52,7 @@
             </table>
         </div>
 
-        <div class="scroll-portfolio">
+        <div id="scroll-portfolio">
             <table class="portfolio">
                 <colgroup>
                     <col class="col-10">
@@ -58,228 +63,186 @@
 
                 <tbody>
                     <tr>
-                        <td>10</td>
-                        <td>Sample Portfolio with long name</td>
-                        <td>10</td> 
-                        <td>$500,000<i class="fas fa-info-circle"></i></td>
-                    </tr>
-                    <tr>
-                        <td>10</td>
-                        <td>Sample Portfolio</td>
-                        <td>10000000000</td> 
-                        <td>$500,000<i class="fas fa-info-circle"></i></td>
-                    </tr>
-                    <tr>
-                        <td>10</td>
+                        <td>1.</td>
                         <td>Sample Portfolio</td>
                         <td>10</td> 
-                        <td>$500,000,000,000,000<i class="fas fa-info-circle"></i></td>
-                    </tr>
-                    <tr>
-                        <td>10</td>
-                        <td>Sample Portfolio</td>
-                        <td>10</td> 
-                        <td>$500,000<i class="fas fa-info-circle"></i></td>
-                    </tr>
-                    <tr>
-                        <td>10</td>
-                        <td>Sample Portfolio</td>
-                        <td>10</td> 
-                        <td>$500,000<i class="fas fa-info-circle"></i></td>
-                    </tr>
-                    <tr>
-                        <td>10</td>
-                        <td>Sample Portfolio</td>
-                        <td>10</td> 
-                        <td>$500,000<i class="fas fa-info-circle"></i></td>
-                    </tr>
-                    <tr>
-                        <td>10</td>
-                        <td>Sample Portfolio</td>
-                        <td>10</td> 
-                        <td>$500,000<i class="fas fa-info-circle"></i></td>
-                    </tr>
-                    <tr>
-                        <td>10</td>
-                        <td>Sample Portfolio</td>
-                        <td>10</td> 
-                        <td>$500,000<i class="fas fa-info-circle"></i></td>
-                    </tr>
-                    <tr>
-                        <td>10</td>
-                        <td>Sample Portfolio</td>
-                        <td>10</td> 
-                        <td>$500,000<i class="fas fa-info-circle"></i></td>
+                        <td>$500,000</td>
                     </tr>
                 </tbody>
             </table>
         </div>
         
         <div>
-            <input type="text", placeholder="Seach Portfolio">
-            <button><i class="fas fa-plus"></i>New</button>
+            <input type="text" id="seach-portfolio" onkeyup="filterTable()" placeholder="Seach Portfolio">
+            <button class="not-allowed" title="Coming soon"><i class="fas fa-plus"></i>New</button>
         </div>
     </div>
     
     <div class="first-row right column">
         <div class="button-group">
-            <div class="large-button">Holdings</div>
-            <div class="large-button">Transactions</div>
+            <div class="large-button" onclick="showTable('holding-detail')">Holdings</div>
+            <div class="large-button" onclick="showTable('transaction-history')">Transactions</div>
             <div class="right-button">
-                <button><i class="fas fa-plus"></i>Add Position</button>
-                <button><i class="far fa-edit"></i>Edit Position</button>
+                <button class="not-allowed" title="Coming soon">
+                    <i class="fas fa-plus"></i>Add Position
+                </button>
+                <button class="not-allowed" title="Coming soon">
+                    <i class="far fa-edit"></i>Edit Position
+                </button>
             </div>
         </div>
 
-        <div class="table-title">
-            <div>Sample Portfolio</div>
+        <div id="table-title" class="title">
+            <div>Portfolio Details</div>
         </div>
 
-        <div>
-            <table class="holdings">
-                <colgroup>
-                    <col class="col-05">
-                    <col class="col-10">
-                    <col class="col-20">
-                    <col class="col-10">
-                    <col class="col-10">
-                    <col class="col-20">
-                    <col class="col-15">
-                    <col class="col-10">
-                </colgroup>
+        <div id="holding-detail">
+            <div>
+                <table class="holdings">
+                    <colgroup>
+                        <col class="col-05">
+                        <col class="col-10">
+                        <col class="col-20">
+                        <col class="col-10">
+                        <col class="col-10">
+                        <col class="col-20">
+                        <col class="col-15">
+                        <col class="col-10">
+                    </colgroup>
 
-                <thead>
-                    <tr>
-                        <th>No.</th>
-                        <th>Symbol</th>
-                        <th>Description</th> 
-                        <th>Shares</th>
-                        <th class="right-align-text">Price</th>
-                        <th class="right-align-text">Daily Change</th>
-                        <th class="right-align-text">Value</th>
-                        <th class="right-align-text">Weight %</th>
-                    </tr>
-                </thead>
-            </table>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Symbol</th>
+                            <th>Description</th> 
+                            <th>Shares</th>
+                            <th class="right-align-text">Price</th>
+                            <th class="right-align-text">Daily Change</th>
+                            <th class="right-align-text">Value</th>
+                            <th class="right-align-text">Weight %</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <div id="scroll-holdings">
+                <table class="holdings">
+                    <colgroup>
+                        <col class="col-05">
+                        <col class="col-10">
+                        <col class="col-20">
+                        <col class="col-10">
+                        <col class="col-10">
+                        <col class="col-20">
+                        <col class="col-15">
+                        <col class="col-10">
+                    </colgroup>
+
+                    <tbody>
+                        <tr>
+                            <td>1.</td>
+                            <td>AMZN</td>
+                            <td>Amazon.com, Inc. Amazon.com, Inc.</td> 
+                            <td>105</td>
+                            <td class="right-align-text">$1804.05</td>
+                            <td class="right-align-text">+50.56 <sup class="down">(2.56%)<i class="fas fa-arrow-up"></i></sup></td>
+                            <td class="right-align-text">$25,000.56</td>
+                            <td class="right-align-text">10.00%</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div>
+                <table class="holdings">
+                    <colgroup>
+                        <col class="col-05">
+                        <col class="col-10">
+                        <col class="col-20">
+                        <col class="col-10">
+                        <col class="col-10">
+                        <col class="col-20">
+                        <col class="col-15">
+                        <col class="col-10">
+                    </colgroup>
+
+                    <thead>
+                        <tr>
+                            <td colspan="6">Cash</td>
+                            <td class="right-align-text">$25,000.56</td>
+                            <td class="right-align-text">45.90%</td>
+                        </tr>
+                        <tr id="total-value" class="total-value-down">
+                            <td colspan="5">
+                                Total Value<i class="fas fa-info-circle"></i>
+                            </td>
+                            <td class="right-align-text">
+                                +50.56 <sup>(2.56%)<i class="fas fa-arrow-up"></i></sup>
+                            </td>
+                            <td class="right-align-text">$500,000.56<sup></sup></td>
+                            <td><sup>(2.45%)<i class="fas fa-arrow-up"></i></sup></td>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
         </div>
 
-        <div class="scroll-holdings">
-            <table class="holdings">
-                <colgroup>
-                    <col class="col-05">
-                    <col class="col-10">
-                    <col class="col-20">
-                    <col class="col-10">
-                    <col class="col-10">
-                    <col class="col-20">
-                    <col class="col-15">
-                    <col class="col-10">
-                </colgroup>
+        <div id="transaction-history">
+            <div>
+                <table class="transactions">
+                    <colgroup>
+                        <col class="col-05">
+                        <col class="col-10">
+                        <col class="col-10">
+                        <col class="col-20">
+                        <col class="col-10">
+                        <col class="col-15">
+                        <col class="col-15">
+                        <col class="col-15">
+                    </colgroup>
 
-                <tbody>
-                    <tr>
-                        <td>10</td>
-                        <td>AMZN</td>
-                        <td>Amazon.com, Inc. Amazon.com, Inc.</td> 
-                        <td>105</td>
-                        <td class="right-align-text">1804.05</td>
-                        <td class="right-align-text">+50.56 <sup>(2.56%)<i class="fas fa-arrow-up"></i></sup></td>
-                        <td class="right-align-text">$25,000.56</td>
-                        <td class="right-align-text">10.00%</td>
-                    </tr>
-                    <tr>
-                        <td>10</td>
-                        <td>AMZN</td>
-                        <td>Amazon.com, Inc.</td> 
-                        <td>50</td>
-                        <td class="right-align-text">1804.05</td>
-                        <td class="right-align-text">+150.56 <sup>(2.56%)<i class="fas fa-arrow-up"></i></sup></td>
-                        <td class="right-align-text">$5,000.56</td>
-                        <td class="right-align-text">10.00%</td>
-                    </tr>
-                    <tr>
-                        <td>10</td>
-                        <td>AMZN</td>
-                        <td>Amazon.com, Inc.</td> 
-                        <td>5</td>
-                        <td class="right-align-text">1804.05</td>
-                        <td class="right-align-text">+50.56 <sup>(2.56%)<i class="fas fa-arrow-up"></i></sup></td>
-                        <td class="right-align-text">$25,000.56</td>
-                        <td class="right-align-text">5.00%</td>
-                    </tr>
-                    <tr>
-                        <td>10</td>
-                        <td>AMZN</td>
-                        <td>Amazon.com, Inc.</td> 
-                        <td>5</td>
-                        <td class="right-align-text">1804.05</td>
-                        <td class="right-align-text">+50.56 <sup>(2.56%)<i class="fas fa-arrow-up"></i></sup></td>
-                        <td class="right-align-text">$25,000.56</td>
-                        <td class="right-align-text">10.00%</td>
-                    </tr>
-                    <tr>
-                        <td>10</td>
-                        <td>AMZN</td>
-                        <td>Amazon.com, Inc.</td> 
-                        <td>5</td>
-                        <td class="right-align-text">1804.05</td>
-                        <td class="right-align-text">+150.56 <sup>(2.56%)<i class="fas fa-arrow-up"></i></sup></td>
-                        <td class="right-align-text">$25,000.56</td>
-                        <td class="right-align-text">10.00%</td>
-                    </tr>
-                    <tr>
-                        <td>10</td>
-                        <td>AMZN</td>
-                        <td>Amazon.com, Inc. Amazon.com, Inc.</td> 
-                        <td>5</td>
-                        <td class="right-align-text">1804.05</td>
-                        <td class="right-align-text">+50.56<sup>(2.56%)<i class="fas fa-arrow-up"></i></sup></td>
-                        <td class="right-align-text">$25,000.56</td>
-                        <td class="right-align-text">10.00%</td>
-                    </tr>
-                    <tr>
-                        <td>10</td>
-                        <td>AMZN</td>
-                        <td>Amazon.com, Inc. Amazon.com, Inc.</td> 
-                        <td>5</td>
-                        <td class="right-align-text">1804.05</td>
-                        <td class="right-align-text">+50.56<sup>(2.56%)<i class="fas fa-arrow-up"></i></sup></td>
-                        <td class="right-align-text">$25,000.56</td>
-                        <td class="right-align-text">10.00%</td>
-                    </tr>
-                </tbody>
-            </table>
-        </div>
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Date</th>
+                            <th>Symbol</th>
+                            <th>Description</th>
+                            <th class="right-align-text">Shares</th>
+                            <th class="right-align-text">Transaction</th>
+                            <th class="right-align-text">Price</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
 
-        <div>
-            <table class="holdings">
-                <colgroup>
-                    <col class="col-05">
-                    <col class="col-10">
-                    <col class="col-20">
-                    <col class="col-10">
-                    <col class="col-10">
-                    <col class="col-20">
-                    <col class="col-15">
-                    <col class="col-10">
-                </colgroup>
+            <div id="scroll-transactions">
+                <table class="transactions">
+                    <colgroup>
+                        <col class="col-05">
+                        <col class="col-10">
+                        <col class="col-10">
+                        <col class="col-20">
+                        <col class="col-10">
+                        <col class="col-15">
+                        <col class="col-15">
+                        <col class="col-15">
+                    </colgroup>
 
-                <thead>
-                    <tr>
-                        <td colspan="6">Cash</td>
-                        <td class="right-align-text">$25,000.56</td>
-                        <td class="right-align-text">45.90%</td>
-                    </tr>
-                    <tr id="total-value">
-                        <td colspan="5">
-                            Total Value<i class="fas fa-info-circle"></i>
-                        </td>
-                        <td class="right-align-text">+50.56 <sup>(2.56%)<i class="fas fa-arrow-up"></i></sup></td>
-                        <td class="right-align-text">$50,000.56<sup></sup></td>
-                        <td><sup>(2.45%)<i class="fas fa-arrow-up"></i><sup></td>
-                    </tr>
-                </thead>
-            </table>
+                    <tbody>
+                        <tr>
+                            <td>1.</td>
+                            <td>2019-05-20</td>
+                            <td>AMZN</td>
+                            <td>Amazon.com, Inc. Amazon.com, Inc.</td>
+                            <td class="right-align-text">55</td>
+                            <td class="right-align-text">10</td>
+                            <td class="right-align-text">$1804.05</td>
+                            <td></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
 </div>
@@ -288,7 +251,7 @@
     <div class="second-row left column">
         <div>
             <table class="statistics">
-                <caption>Portfolio Statistics</caption>
+                <caption class="title">Risk & Performance</caption>
 
                 <colgroup>
                     <col class=".col-50">
@@ -297,7 +260,7 @@
 
                 <thead>
                     <tr>
-                        <th>Attribute</th>
+                        <th>Metrics</th>
                         <th class="right-align-text">Value</th>
                     </tr>
                 </thead>
@@ -352,7 +315,7 @@
         </div>
     </div>
 
-    <div id= "plot" class="second-row right column"></div>
+    <div id="svg" class="second-row right column"></div>
 </div>
 
 <hr>

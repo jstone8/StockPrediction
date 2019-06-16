@@ -11,8 +11,9 @@ from util import get_last_line, pop_last_line
 logger = logging.getLogger(__name__)
 
 _data_folder = './data/transaction/'
-_transaction_file = _data_folder + 'transaction.csv'
+_portfolio_file = _data_folder + 'portfolio.csv'
 _prob_pred_file = _data_folder + 'prob_pred.csv'
+_trade_history_file = _data_folder + 'trade_history.csv'
 
 
 def init_transaction():
@@ -32,16 +33,20 @@ def init_transaction():
     cash = total_value - sum([share[symbol] * close[symbol] for symbol in symbols])
 
     header = ['date'] + [symbol + t for symbol in symbols for t in ['_share', '_open', '_close']]
-    header += ['cash', 'total_value']
+    header += ['cash', 'total_value', 'benchmark']
     values = [today] + [v for symbol in symbols for v in [share[symbol], open_[symbol], close[symbol]]]
-    values += [round(cash, 4), round(total_value, 4)]
+    values += [round(cash, 4), round(total_value, 4), round(total_value, 4)]
 
-    with open(_transaction_file, 'w') as f:
+    with open(_portfolio_file, 'w') as f:
         f.write(','.join(header) + '\n')
         f.write(','.join(map(str, values)) + '\n')
 
     with open(_prob_pred_file, 'w') as f:
         header = ['date'] + [symbol + t for symbol in symbols for t in ['_neg', '_neu', '_pos']]
+        f.write(','.join(header) + '\n')
+
+    with open(_trade_history_file, 'w') as f:
+        header = ['date', 'symbol', 'share', 'transaction', 'price']
         f.write(','.join(header) + '\n')
 
 
@@ -51,7 +56,7 @@ def _validate_cash():
     '''
     logger.info('Called')
 
-    data = pd.read_csv(_transaction_file, sep=',')
+    data = pd.read_csv(_portfolio_file, sep=',')
     min_cash = data['cash'].min()
 
     if min_cash < 0:
@@ -59,40 +64,45 @@ def _validate_cash():
 
         data['cash'] += -min_cash
         data['total_value'] += -min_cash
-        data.to_csv(_transaction_file, float_format='%.4f', index=False)
+        data['benchmark'] += -min_cash
+        data.to_csv(_portfolio_file, float_format='%.4f', index=False)
 
 
 def get_init_share() -> dict:
     symbols = db_init['symbols']
 
-    with open(_transaction_file, 'r') as f:
+    with open(_portfolio_file, 'r') as f:
         f.readline()
         line = f.readline().split(',')
 
-    share = {s: int(v) for s, v in zip(symbols, line[1:-2:3])}
+    share = {s: int(v) for s, v in zip(symbols, line[1:-3:3])}
+    cash = float(line[-3])
 
-    return share
+    return share, cash
 
 
-def update_fund():
-    '''Finalized the last transaction using the lastest daily price data, if available.
+def finalize_transaction():
+    '''Finalized the transaction for today based on the predicted probabilities and
+       update the fund using the lastest daily price data.
 
-       If today is a trading day, then buy shares at the open price, based on 
-       the trading decisions (i.e. the number of shares to buy) made before 
-       the market is open. The total value at the end of day is calculated 
-       with the close price. If not a trading day, do nothing.
+       Rule to follow:
+           If today is a trading day, then buy shares at the open price, based on 
+           the predicted probabilities and the derived trading strategy. The total 
+           value at the end of day is calculated with the close price. 
+
+           If not a trading day, do nothing.
     '''
     logger.info('Called')
 
     db, symbols = db_init['db'], db_init['symbols']
 
-    # Trading decisions for this day
-    curr_transaction = pop_last_line(_transaction_file).split(',')
-    if curr_transaction[0] != 'NA':
-        logger.error('Trading decision not available: %s', curr_transaction[0])
+    # Probabilities of price change for this day
+    curr_prob = pop_last_line(_prob_pred_file).split(',')
+    if curr_prob[0] != 'NA':
+        logger.error('Probability data not available: %s', curr_prob[0])
 
-    last_transaction = get_last_line(_transaction_file).split(',')
-    cash = float(last_transaction[-2])
+    last_transaction = get_last_line(_portfolio_file).split(',')
+    cash = float(last_transaction[-3])
     last_trade_day = Database.get_last_trade_day(db, symbols[0])
 
     logger.info('Last trade day: %s', last_trade_day)
@@ -101,11 +111,13 @@ def update_fund():
         logger.error('Unexpected behavior for last trade and transaction date')
 
     # New daily price data is available to finalize the transaction
-    if last_trade_day > last_transaction[0] and curr_transaction[0] == 'NA':
+    if last_trade_day > last_transaction[0] and curr_prob[0] == 'NA':
         logger.info('Finalize transaction for: %s', last_trade_day)
 
-        last_share = {s: int(v) for s, v in zip(symbols, last_transaction[1:-2:3])}
-        curr_share = {s: int(v) for s, v in zip(symbols, curr_transaction[1:-2:3])}
+        init_share, init_cash = get_init_share()
+        curr_share = {s: int(v) for s, v in zip(symbols, last_transaction[1:-3:3])}
+        probs = {s: tuple(map(float, curr_prob[i * 3 + 1 : i * 3 + 4])) for i, s in enumerate(symbols)}
+
         curr_open, curr_close = {}, {}
 
         # Get open and close price for this day
@@ -115,55 +127,62 @@ def update_fund():
 
         # Buy/sell shares at the open price
         for symbol in symbols:
-            cash -= (curr_share[symbol] - last_share[symbol]) * curr_open[symbol]
+            # A simple strategy
+            pos, neg = probs[symbol][-1], probs[symbol][0]
+            transaction = int(round(init_share[symbol] * (pos - neg) / 2, 0))
+            
+            # Do not consider short-selling
+            if curr_share[symbol] + transaction < 0:
+                transaction = -curr_share[symbol]
 
-        # Total value at the end of day
+            logger.info('Trading decision for %s (%d): %d share (%.4f, %.4f)', 
+                        symbol, curr_share[symbol], transaction, pos, neg)
+
+            # Log this transaction to trade history
+            with open(_trade_history_file, 'a') as f:
+                record = (last_trade_day, symbol, curr_share[symbol], transaction, round(curr_open[symbol], 4))
+                f.write(','.join(map(str, record)) + '\n')
+
+            # Update number of shares and cash
+            curr_share[symbol] += transaction
+            cash -= transaction * curr_open[symbol]
+
+        # Total value and benchmark at the end of day
         total = cash + sum(curr_share[symbol] * curr_close[symbol] for symbol in symbols)
+        benchmark = init_cash + sum(init_share[symbol] * curr_close[symbol] for symbol in symbols)
 
         # Update the transaction information
         curr_transaction = [last_trade_day]
         for symbol in symbols:
             curr_transaction += [curr_share[symbol], curr_open[symbol], curr_close[symbol]]
-        curr_transaction += [round(cash, 4), round(total, 4)]
+        curr_transaction += [round(cash, 4), round(total, 4), round(benchmark, 4)]
+
+        with open(_portfolio_file, 'a') as f:
+            f.write(','.join(map(str, curr_transaction)) + '\n')
 
         # Update the date for the probability predictions made for this day
-        prob_pred = pop_last_line(_prob_pred_file).split(',')
-        prob_pred[0] = last_trade_day
+        curr_prob[0] = last_trade_day
 
-        with open(_prob_pred_file, 'a') as f:
-            f.write(','.join(map(str, prob_pred)) + '\n')
+        _validate_cash()
 
-    with open(_transaction_file, 'a') as f:
-        f.write(','.join(map(str, curr_transaction)) + '\n')
-
-    _validate_cash()
+    with open(_prob_pred_file, 'a') as f:
+        f.write(','.join(curr_prob) + '\n')
 
 
-def make_trade_decision():
-    '''Train model and make a trading decison for each symbol. Trading decisions 
-       are to be used for the next trading day 
-
-       If run on the non-trading day, e.g. weekends, the current trading decisions are updated
+def predict_price_change():
+    '''Train model and predict probability of price change in the next day for each symbol.
+       If run on the non-trading day, e.g. weekends, the current probabilities are updated
     '''
     logger.info('Called')
     
     symbols = db_init['symbols']
-
-    init_share = get_init_share()
-    line = get_last_line(_transaction_file).split(',')
+    line = get_last_line(_prob_pred_file).split(',')
     
-    # If the transaction has not been finalized, update the probability predictions
-    # as well as the current trading decisions
+    # If on the non-trading day, update the probability predictions
     if line[0] == 'NA':
-        logger.info('Update the current trading decision')
-        
-        pop_last_line(_transaction_file)
+        logger.info('Update the current predicted probabilities')
         pop_last_line(_prob_pred_file)
-        line = get_last_line(_transaction_file).split(',')
 
-        logger.info('Last transaction data retrieved: %s', line[0])
-
-    curr_share = {s: int(v) for s, v in zip(symbols, line[1:-2:3])}
     prob_pred = {}
 
     for symbol in symbols:
@@ -173,24 +192,6 @@ def make_trade_decision():
         
         neg, neu, pos = model.predict_proba()
         prob_pred[symbol] = tuple(map(lambda x: round(x, 4), (neg, neu, pos)))
-
-        # A simple strategy
-        transaction = int(round(init_share[symbol] * (pos - neg) / 2, 0))
-        
-        # Do not consider short-selling
-        if curr_share[symbol] + transaction < 0:
-            transaction = -curr_share[symbol]
-
-        curr_share[symbol] += transaction
-
-        logger.info('Trading decision for %s: %d share', symbol, transaction)
-
-    # Log trading decisions for the next trading day
-    values = ['NA'] + [v for symbol in symbols for v in [curr_share[symbol], 'NA', 'NA']]
-    values += ['NA', 'NA']
-
-    with open(_transaction_file, 'a') as f:
-        f.write(','.join(map(str, values)) + '\n')
 
     # Log probability predictions for the next trading day
     prob = ['NA'] + [v for symbol in symbols for v in prob_pred[symbol]]
@@ -202,11 +203,11 @@ def make_trade_decision():
 def trade():
     logger.info('Start trading process')
 
-    update_fund()
-    make_trade_decision()
+    finalize_transaction()
+    predict_price_change()
 
     logger.info('Complete trading process')
 
 
 if __name__ == '__main__':
-    pass
+    trade()

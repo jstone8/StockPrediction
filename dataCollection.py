@@ -141,7 +141,6 @@ class StockNews(object):
             'tickers' : symbol,
             'items'   : 50,
             'type'    : 'article',
-            'fallback': 'false',
             'token'   : api_keys['stock_news'],
         }
 
@@ -225,7 +224,7 @@ def collect_data():
 
     logger.info('Insert %d market news into the news table', len(gen_news))
     time.sleep(10)
-
+    
     for symbol in symbols:
         sym_news = StockNews.get_ticker_news(symbol=symbol)
         sym_news = StockNews.prc_data(sym_news, trim_to_date=today, db=db)

@@ -3,7 +3,7 @@
 import logging
 import pandas as pd
 from typing import Sequence, List, Tuple, Dict
-from config import db_init
+from config import db_init, data_path
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 from database import Database, retrieve_price_news
 from indicator import Indicator
@@ -11,7 +11,7 @@ from util import get_last_line, pop_last_line
 
 logger = logging.getLogger(__name__)
 
-_data_folder = './data/feature/'
+_data_folder = data_path['root_path'] + 'feature/'
 _since_this_date = '2018-01-01'
 
 

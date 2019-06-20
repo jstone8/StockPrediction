@@ -3,6 +3,7 @@
 import pytz
 import time
 from typing import Sequence, List, Tuple, Dict
+from collections import deque
 from datetime import datetime
 from functools import wraps
 
@@ -71,7 +72,10 @@ def get_last_line(filepath: str) -> str:
 
 
 def pop_last_line(filepath: str) -> str:
-    '''Pop the last line of a file'''
+    '''Pop the last line of a file
+        
+       @param: filepath: path/name of the file
+    '''
 
     with open(filepath, 'r') as f:
         lines = f.readlines()
@@ -81,3 +85,15 @@ def pop_last_line(filepath: str) -> str:
             f.write(line)
 
     return lines[-1].strip() if len(lines) > 0 else ''
+
+
+def get_last_n_lines(filepath: str, n: int) -> Tuple[str]:
+    '''Read the last n lines of a file.
+
+       @param: filepath: path/name of the file
+       @param: n: number of lines to read
+    '''
+    with open(filepath, 'r') as f:
+        last_n_lines = deque(f, n)
+
+    return map(lambda line: line.strip(), last_n_lines)

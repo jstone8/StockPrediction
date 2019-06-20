@@ -3,14 +3,14 @@
 import logging
 import pandas as pd
 from datetime import datetime
-from config import db_init
+from config import db_init, data_path
 from database import Database
 from model import Model
-from util import get_last_line, pop_last_line
+from util import get_last_line, pop_last_line, get_last_n_lines
 
 logger = logging.getLogger(__name__)
 
-_data_folder = './data/transaction/'
+_data_folder = data_path['root_path'] + 'transaction/'
 _portfolio_file = _data_folder + 'portfolio.csv'
 _prob_pred_file = _data_folder + 'prob_pred.csv'
 _trade_history_file = _data_folder + 'trade_history.csv'
@@ -50,6 +50,41 @@ def init_transaction():
         f.write(','.join(header) + '\n')
 
 
+def get_init_holding():
+    symbols = db_init['symbols']
+
+    with open(_portfolio_file, 'r') as f:
+        f.readline()
+        line = f.readline().split(',')
+
+    share = {s: int(v) for s, v in zip(symbols, line[1:-3:3])}
+    cash, total_value = float(line[-3]), float(line[-2])
+
+    return share, cash, total_value
+
+
+def get_curr_holding():
+    symbols = db_init['symbols']
+
+    line = get_last_line(_portfolio_file).split(',')
+    share = {s: int(v) for s, v in zip(symbols, line[1:-3:3])}
+    cash, total_value = float(line[-3]), float(line[-2])
+
+    return share, cash, total_value
+
+
+def get_portfolio_benchmark():
+    data = pd.read_csv(_portfolio_file, sep=',', index_col='date', 
+                       usecols=['date', 'total_value', 'benchmark'])
+    return data
+
+
+def get_transaction_history():
+    with open(_trade_history_file, 'r') as f:
+        f.readline()
+        return f.readlines()
+
+
 def _validate_cash():
     '''Reset cash to a higher value if it is negative in any date, which 
        means there is always sufficient cash for trading
@@ -66,19 +101,6 @@ def _validate_cash():
         data['total_value'] += -min_cash
         data['benchmark'] += -min_cash
         data.to_csv(_portfolio_file, float_format='%.4f', index=False)
-
-
-def get_init_share() -> dict:
-    symbols = db_init['symbols']
-
-    with open(_portfolio_file, 'r') as f:
-        f.readline()
-        line = f.readline().split(',')
-
-    share = {s: int(v) for s, v in zip(symbols, line[1:-3:3])}
-    cash = float(line[-3])
-
-    return share, cash
 
 
 def finalize_transaction():
@@ -114,7 +136,7 @@ def finalize_transaction():
     if last_trade_day > last_transaction[0] and curr_prob[0] == 'NA':
         logger.info('Finalize transaction for: %s', last_trade_day)
 
-        init_share, init_cash = get_init_share()
+        init_share, init_cash, _ = get_init_holding()
         curr_share = {s: int(v) for s, v in zip(symbols, last_transaction[1:-3:3])}
         probs = {s: tuple(map(float, curr_prob[i * 3 + 1 : i * 3 + 4])) for i, s in enumerate(symbols)}
 
@@ -210,4 +232,4 @@ def trade():
 
 
 if __name__ == '__main__':
-    trade()
+    data = get_curr_holding()

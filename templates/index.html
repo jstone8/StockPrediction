@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Quantstone</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.7.0/css/all.css" integrity="sha384-lZN37f5QGtY3VHgisS14W3ExzMWZxybE1SJSEsQp9S+oqd12jhcu+A56Ebc1zFSJ" crossorigin="anonymous">
+    <link rel="stylesheet" type="text/css" href="{{ url_for('static', filename='style.css') }}">
+    
+    <script src="http://d3js.org/d3.v3.min.js" defer></script>
+    <script src="{{ url_for('static', filename='script.js') }}" defer></script>
+    <script src="{{ url_for('static', filename='utils.js') }}" defer></script>
+</head>
+
+<body>
+<div class="row">
+    <div class="header">
+        <div class="topnav">
+            <div href="#" class="selected">Portfolios</div>
+            <div href="#" title="Coming soon" class="not-allowed">Forecast</div>
+        </div>
+
+        <div class="info">
+            <a href="#"><i class="fas fa-user user"></i>Welcome</a>
+            <a href="mailto:example@gmail.com"><i class="fas fa-envelope contact"></i>Contact</a>
+        </div>
+    </div>
+</div>
+
+<hr>
+
+<div class="row">
+    <div class="first-row left column">
+        <div>
+            <table class="portfolio">
+                <colgroup>
+                    <col class="col-10">
+                    <col class="col-45">
+                    <col class="col-15">
+                    <col class="col-30">
+                </colgroup>
+
+                <thead>
+                    <tr>
+                        <th>No.</th>
+                        <th>Portfolio Name</th>
+                        <th>Size</th> 
+                        <th>Total Value</th>
+                    </tr>
+                </thead>
+            </table>
+        </div>
+
+        <div id="scroll-portfolio">
+            <table class="portfolio">
+                <colgroup>
+                    <col class="col-10">
+                    <col class="col-45">
+                    <col class="col-15">
+                    <col class="col-30">
+                </colgroup>
+
+                <tbody>
+                    <tr>
+                        <td>1.</td>
+                        <td>{{ portfolio }}</td>
+                        <td>{{ size }}</td> 
+                        <td>
+                            {% if total_value == '-' %}
+                                {{ '-' }}
+                            {% else %}
+                                {{ '${:,.2f}'.format(total_value) }}
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        
+        <div>
+            <input type="text" id="seach-portfolio" onkeyup="filterTable()" placeholder="Seach Portfolio">
+            <button class="not-allowed" title="Coming soon"><i class="fas fa-plus"></i>New</button>
+        </div>
+    </div>
+    
+    <div class="first-row right column">
+        <div class="button-group">
+            <div class="large-button" onclick="showTable('holding-detail')">Holdings</div>
+            <div class="large-button" onclick="showTable('transaction-history')">Transactions</div>
+            <div class="right-button">
+                <button class="not-allowed" title="Coming soon">
+                    <i class="fas fa-plus"></i>Add Position
+                </button>
+                <button class="not-allowed" title="Coming soon">
+                    <i class="far fa-edit"></i>Edit Position
+                </button>
+            </div>
+        </div>
+
+        <div id="table-title" class="title">
+            <div>Portfolio Details</div>
+        </div>
+
+        <div id="holding-detail">
+            <div>
+                <table class="holdings">
+                    <colgroup>
+                        <col class="col-05">
+                        <col class="col-10">
+                        <col class="col-20">
+                        <col class="col-10">
+                        <col class="col-10">
+                        <col class="col-20">
+                        <col class="col-15">
+                        <col class="col-10">
+                    </colgroup>
+
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Symbol</th>
+                            <th>Company</th> 
+                            <th>Shares</th>
+                            <th class="right-align-text">Price</th>
+                            <th class="right-align-text">Daily Change</th>
+                            <th class="right-align-text">Value</th>
+                            <th class="right-align-text">Weight %</th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <div id="scroll-holdings">
+                <table class="holdings">
+                    <colgroup>
+                        <col class="col-05">
+                        <col class="col-10">
+                        <col class="col-20">
+                        <col class="col-10">
+                        <col class="col-10">
+                        <col class="col-20">
+                        <col class="col-15">
+                        <col class="col-10">
+                    </colgroup>
+
+                    <tbody>
+                        {% for symbol in share %}
+                            <tr>
+                                <td>{{ '{0}.'.format(loop.index) }}</td>
+                                <td>{{ symbol }}</td>
+                                <td>{{ description[symbol] }}</td> 
+                                <td>{{ share[symbol] }}</td>
+                                <td class="right-align-text">
+                                    {% if price[symbol][1] == '-' %}
+                                        {{ '-' }}
+                                    {% else %}
+                                        {{ '${0:,.2f}'.format(price[symbol][1]) }}
+                                    {% endif %}
+                                </td>
+                                <td class="right-align-text">
+                                    {% if price[symbol][1] == '-' %}
+                                        {{ '-' }} <sup class="up">{{ '(-%)' }}<i class="fas fa-arrow-up"></i></sup>
+                                    {% else %}
+                                        {% set change = price[symbol][1] - price[symbol][0] %}
+                                        {% set pct = 100 * change / price[symbol][0] %}
+                                        {{ '{0:+.2f}'.format(change) }} <sup class="{{ 'up' if change >= 0 else 'down' }}">{{ '({0:.2f}%)'.format(pct) }}<i class="fas fa-arrow-{{ 'up' if change >= 0 else 'down' }}"></i></sup>
+                                    {% endif %}
+                                </td>
+                                <td class="right-align-text">
+                                    {% if price[symbol][1] == '-' %}
+                                        {{ '-' }}
+                                    {% else %}
+                                        {{ '${0:,.2f}'.format(price[symbol][1] * share[symbol]) }}
+                                    {% endif %}
+                                </td>
+                                <td class="right-align-text">
+                                    {% if price[symbol][1] == '-' or total_value == '-' %}
+                                        {{ '-%' }}
+                                    {% else %}
+                                        {{ '{0:.2f}%'.format(100 * price[symbol][1] * share[symbol] / total_value) }}
+                                    {% endif %}
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div>
+                <table class="holdings">
+                    <colgroup>
+                        <col class="col-05">
+                        <col class="col-10">
+                        <col class="col-20">
+                        <col class="col-10">
+                        <col class="col-10">
+                        <col class="col-20">
+                        <col class="col-15">
+                        <col class="col-10">
+                    </colgroup>
+
+                    <thead>
+                        <tr>
+                            <td colspan="6">Cash</td>
+                            <td class="right-align-text">{{ '${0:,.2f}'.format(cash) }}</td>
+                            <td class="right-align-text">
+                                {% if total_value == '-' %}
+                                    {{ '-%' }}
+                                {% else %}
+                                    {{ '{0:.2f}%'.format(100 * cash / total_value) }}
+                                {% endif %}
+                            </td>
+                        </tr>
+                        <tr id="total-value" class="total-value-{{ 'up' if total_pct == '-' or total_pct >= 0 else 'down' }}">
+                            <td colspan="5">
+                                Total Value<i class="fas fa-info-circle"></i>
+                            </td>
+                            <!-- For daily change of total value
+                            <td class="right-align-text">
+                                +50.56 <sup>(2.56%)<i class="fas fa-arrow-up"></i></sup>
+                            </td>
+                            -->
+                            <td></td>
+                            <td class="right-align-text">
+                                {% if total_value == '-' %}
+                                    {{ '-' }}
+                                {% else %}
+                                    {{ '${0:,.2f}'.format(total_value) }}
+                                {% endif %}
+                                <sup></sup>
+                            </td>
+                            <td>
+                                {% if total_pct == '-' %}
+                                    <sup>{{ '(-%)' }}<i class="fas fa-arrow-up"></i></sup>
+                                {% else %}
+                                    <sup>{{ '({0:.2f}%)'.format(total_pct) }}<i class="fas fa-arrow-{{ 'up' if total_pct >= 0 else 'down' }}"></i></sup>
+                                {% endif %}
+                            </td>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+        </div>
+
+        <div id="transaction-history">
+            <div>
+                <table class="transactions">
+                    <colgroup>
+                        <col class="col-05">
+                        <col class="col-10">
+                        <col class="col-10">
+                        <col class="col-20">
+                        <col class="col-10">
+                        <col class="col-15">
+                        <col class="col-15">
+                        <col class="col-15">
+                    </colgroup>
+
+                    <thead>
+                        <tr>
+                            <th>No.</th>
+                            <th>Date</th>
+                            <th>Symbol</th>
+                            <th>Company</th>
+                            <th class="right-align-text">Shares</th>
+                            <th class="right-align-text">Transaction</th>
+                            <th class="right-align-text">Trading Price</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                </table>
+            </div>
+
+            <div id="scroll-transactions">
+                <table class="transactions">
+                    <colgroup>
+                        <col class="col-05">
+                        <col class="col-10">
+                        <col class="col-10">
+                        <col class="col-20">
+                        <col class="col-10">
+                        <col class="col-15">
+                        <col class="col-15">
+                        <col class="col-15">
+                    </colgroup>
+
+                    <tbody>
+                        {% for line in transaction %}
+                            {% set data = line.split(',') %}
+                            <tr>
+                                <td>{{ '{0}.'.format(loop.index) }}</td>
+                                <td>{{ data[0] }}</td>
+                                <td>{{ data[1] }}</td>
+                                <td>{{ description[data[1]] }}</td>
+                                <td class="right-align-text">{{ data[2] }}</td>
+                                <td class="right-align-text">{{ data[3] }}</td>
+                                <td class="right-align-text">{{ "$" + data[4] }}</td>
+                                <td></td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="second-row left column">
+        <div>
+            <table class="statistics">
+                <caption class="title">Risk & Performance</caption>
+
+                <colgroup>
+                    <col class=".col-50">
+                    <col class=".col-50">
+                </colgroup>
+
+                <thead>
+                    <tr>
+                        <th>Metrics</th>
+                        <th class="right-align-text">Value</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+                    <tr>
+                        <td>Sharp</td>
+                        <td class="right-align-text">0.05</td>
+                    </tr>
+                    <tr>
+                        <td>Volatility</td>
+                        <td class="right-align-text">0.95%</td>
+                    </tr>
+                    <tr>
+                        <td>Beta</td>
+                        <td class="right-align-text">0.45</td>
+                    </tr>
+                    <tr>
+                        <td>1yr High</td>
+                        <td class="right-align-text">$50,500.56</td>
+                    </tr>
+                    <tr>
+                        <td>1yr Low</td>
+                        <td class="right-align-text">$49,300.56</td>
+                    </tr>
+                    <tr>
+                        <td>Daily Change</td>
+                        <td class="right-align-text">$5,000.34<i class="fas fa-arrow-up"></i></td>
+                    </tr>
+                    <tr>
+                        <td>% Daily Change</td>
+                        <td class="right-align-text">4.65%<i class="fas fa-arrow-up"></i></td>
+                    </tr>
+                    <tr>
+                        <td>WTD Return</td>
+                        <td class="right-align-text">1.34%<i class="fas fa-arrow-up"></i></td>
+                    </tr>
+                    <tr>
+                        <td>MTD Return</td>
+                        <td class="right-align-text">1.45%<i class="fas fa-arrow-up"></i></td>
+                    </tr>
+                    <tr>
+                        <td>QTD Return</td>
+                        <td class="right-align-text">1.42%<i class="fas fa-arrow-up"></i></td>
+                    </tr>
+                    <tr>
+                        <td>YTD Return</td>
+                        <td class="right-align-text">0.59%<i class="fas fa-arrow-up"></i></td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <div id="svg" class="second-row right column"></div>
+</div>
+
+<hr>
+
+<div class="footer">
+    <div class="copyright">&copy; 2019 by J. Shi. All Rights Reserved.</div>
+    <div class="timestamp">Updated: 2019-06-01 18:00:00 -0400</div>
+</div>
+
+</body>
+</html>

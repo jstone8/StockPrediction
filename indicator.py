@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import talib
 import numpy as np
+
+import talib
 
 
 class Indicator(object):

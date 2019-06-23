@@ -1,5 +1,5 @@
 var chartWidth = 873, chartHeight = 350,
-    datafile = 'static/data/transaction/portfolio.csv';
+    datafile = 'data/portfolio';
 
 var margin = {top: 75, right: 10, bottom: 90, left: 35},
     margin2 = {top: 290, right: 10, bottom: 20, left: 35},

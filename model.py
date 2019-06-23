@@ -5,7 +5,9 @@ import pandas as pd
 from typing import Sequence, List, Tuple, Dict
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
+
 from config import data_path
+
 
 logger = logging.getLogger(__name__)
 

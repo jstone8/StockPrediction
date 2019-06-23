@@ -3,11 +3,13 @@
 import logging
 import requests
 import time
-from typing import Sequence, List, Tuple, Dict
 from datetime import datetime
+from typing import Sequence, List, Tuple, Dict
+
 from database import Database
 from config import api_keys, db_init
 from util import standardize_datetime, validate_date_fmt
+
 
 logger = logging.getLogger(__name__)
 

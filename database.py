@@ -1,9 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import mysql.connector
 from typing import Sequence, List, Tuple, Dict
-from config import access_credential, db_init
+
+import mysql.connector
+
+from config import db_access, db_init
+
 
 logger = logging.getLogger(__name__)
 
@@ -123,7 +126,7 @@ class Database(object):
            @param: other_symbols: additional symbols to add
         '''
 
-        connect = mysql.connector.connect(host='localhost', **access_credential)
+        connect = mysql.connector.connect(**db_access)
         cursor = connect.cursor()
 
         cursor.execute(create_db.format(db=db))
@@ -148,7 +151,7 @@ class Database(object):
            @param: data: sequence of records to be inserted
         '''
 
-        connect = mysql.connector.connect(host='localhost', **access_credential)
+        connect = mysql.connector.connect(**db_access)
         cursor = connect.cursor()
         cursor.execute('USE ' + db)
 
@@ -183,7 +186,7 @@ class Database(object):
            @return: List of tuples
         '''
 
-        connect = mysql.connector.connect(host='localhost', **access_credential)
+        connect = mysql.connector.connect(**db_access)
         cursor = connect.cursor()
         cursor.execute('USE ' + db)
 

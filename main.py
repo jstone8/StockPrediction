@@ -1,9 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import logging
+
 from dataCollection import collect_data
 from feature import update_feature
 from transaction import trade
+
 
 _log_folder = './log/'
 _log_filename = _log_folder + 'stock_prediction.log'

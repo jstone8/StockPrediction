@@ -1,18 +1,16 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import requests
-import json
-import datetime
+from typing import Sequence
 from flask import Flask, render_template
-from pymemcache.client.base import Client
-from config import api_keys, db_init, description
-from dataCollection import StockPrice
-from transaction import get_init_holding, get_curr_holding, get_portfolio_benchmark
-from transaction import get_transaction_history
+
+from config import db_init, description
+from cache import Cache, collect_price
+from transaction import get_portfolio_data
+
 
 app = Flask(__name__)
-'''
+
 _log_folder = './log/'
 _log_filename = _log_folder + 'web.log'
 
@@ -26,116 +24,105 @@ log_param = {
 }
 
 logging.basicConfig(**log_param)
-'''
-
-_host, _port = '127.0.0.1', 8000
-
-def _json_serializer(key, value):
-    if type(value) == str: return value, 1
-    return json.dumps(value), 2
 
 
-def _json_deserializer(key, value, flag):
-   if flag == 1: return value
-   if flag == 2: return json.loads(value)
-   raise Exception('Unknown flag for value: {0}'.format(flag))
+def prepare_data(symbols: Sequence[str]):
+    '''Prepare data for front-end rendering'''
 
+    logging.info('Called')
 
-def _get_price(symbol):
-    sp = StockPrice(symbol)
-    sp.get_daily_adjusted()
-    data = sp.daily_ts
-    key = 'Time Series (Daily)'
-
-    if key in data:
-        prev_key, curr_key = sorted(data[key])[-2:]
-        prev = float(data[key][prev_key]['5. adjusted close'])
-        curr = float(data[key][curr_key]['5. adjusted close'])
-    else:
-        prev, curr = '-', '-'
-
-    #logging.info('Get price for %s: prev (%s) %s, curr (%s) %s', symbol, 
-    #            prev_key, prev, curr_key, curr)
-
-    return prev, curr
-
-
-def prepare_data(symbols):
-    #logging.info('Called')
-
-    client = Client((_host, _port), timeout=30, ignore_exc=True)
-
-    # Get current holdings and cash from the portfolio file
-    share, cash = client.get('share'), client.get('cash')
+    # ==========================================================================
+    # Get current shares and cash
+    share, cash = Cache.get_cached('share'), Cache.get_cached('cash')
     
-    if share is None:
-        share, cash, _ = get_curr_holding()
+    if share is None or cash is None:
+        logging.warn('Share and/or cash data not found')
+        share, cash = Cache.set_share_cash()
 
-        client.set('share', share)
-        client.set('cash', cash)
-
-        #logging.info('Set share from holdings at %s (today %s)', holding[0], 
-        #             datetime.today().strftime('%Y-%m-%d'))
-
+    # ==========================================================================
     # Get realtime price and the one in the previous trading day for each symbol
-    price = client.get('price')
-    all_success = True
+    price = Cache.get_cached('price')
 
     if price is None:
-        # logging.info('Collect price data for each symbol')
-
+        logging.warn('Price data not found')
         price = {}
 
-        for i, symbol in enumerate(symbols):
-            prev, curr = _get_price(symbol)
+        for symbol in symbols:
+            temp = Cache.get_cached(symbol)
+            
+            if temp is not None and temp[0] != '-' and temp[1] != '-':
+                prev, curr = temp
+            else:
+                prev, curr = collect_price(symbol)
+                Cache.set_cached(symbol, (prev, curr), expire=5*60)
+            
             price[symbol] = (prev, curr)
-            if prev == '-' or curr == '-': all_success = False
 
-        client.set('price', price, expire=5*60)
-
-    # Calculate total value
-    if all_success:
+    # ==========================================================================
+    # Calculate total value and value change percentage
+    if all(['-' not in val for val in price.values()]):
         total_value = cash
 
         for symbol in symbols:
             total_value += share[symbol] * price[symbol][1]
 
         # Get initial total value
-        init_value = client.get('init_value')
+        init_value = Cache.get_cached('init_value')
 
         if init_value is None:
-            _, _, init_value = get_init_holding()
-            client.set('init_value', init_value)
+            logging.warn('Initial total value of portfolio not found')
+            init_value = Cache.set_init_value()
 
-        total_value_change = 100 * (total_value - init_value) / init_value
+        total_value_pct = 100 * (total_value - init_value) / init_value
     
     else:
-        total_value, total_value_change = '-', '-'
+        total_value, total_value_pct = '-', '-'
 
-    return share, price, cash, total_value, total_value_change
+    # ==========================================================================
+    # Get transaction history
+    transaction = Cache.get_cached('transaction')
+    
+    if transaction is None:
+        logging.warn('Transaction data not found')
+        transaction = Cache.set_transaction()
+
+    # ==========================================================================
+    # Get portfolio statistics
+    stats = Cache.get_cached('stats')
+
+    if stats is None:
+        logging.warn('Portfolio statistics data not found')
+        stats = Cache.set_stats()
 
 
-@app.route('/')
-def index():
-    #logging.info('Receive request')
-
-    symbols = db_init['symbols']
-    share, price, cash, total_value, total_value_change = prepare_data(symbols)
-
-    param = {
+    return {
         'portfolio'  : 'Sample Portfolio',
         'size'       : len(symbols),
         'share'      : share,
         'price'      : price,
         'cash'       : cash,
         'total_value': total_value,
-        'total_pct'  : total_value_change,
+        'total_pct'  : total_value_pct,
         'description': description,
-        'transaction': get_transaction_history(),
+        'transaction': transaction,
+        'stats'      : stats,
     }
+
+
+@app.route('/')
+def index():
+    logging.info('Receive request')
+
+    symbols = db_init['symbols']
+    data = prepare_data(symbols)
     
-    return render_template('index.html', **param)
+    return render_template('index.html', **data)
+
+
+@app.route('/data/portfolio')
+def get_portfolio():
+    return get_portfolio_data()
 
 
 if __name__ == '__main__':
-    app.run(host=_host, port=_port)
+    app.run()

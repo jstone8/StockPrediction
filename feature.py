@@ -3,11 +3,14 @@
 import logging
 import pandas as pd
 from typing import Sequence, List, Tuple, Dict
-from config import db_init, data_path
+
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
+
+from config import db_init, data_path
 from database import Database, retrieve_price_news
 from indicator import Indicator
 from util import get_last_line, pop_last_line
+
 
 logger = logging.getLogger(__name__)
 

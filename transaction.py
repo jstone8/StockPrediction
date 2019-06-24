@@ -1,12 +1,15 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import pandas as pd
 from datetime import datetime
+
+import pandas as pd
+
 from config import db_init, data_path
 from database import Database
 from model import Model
-from util import get_last_line, pop_last_line, get_last_n_lines
+from util import get_last_line, pop_last_line
+
 
 logger = logging.getLogger(__name__)
 
@@ -51,6 +54,8 @@ def init_transaction():
 
 
 def get_init_holding():
+    '''Get initial holding'''
+
     symbols = db_init['symbols']
 
     with open(_portfolio_file, 'r') as f:
@@ -64,25 +69,45 @@ def get_init_holding():
 
 
 def get_curr_holding():
+    '''Get current holding'''
+
     symbols = db_init['symbols']
 
     line = get_last_line(_portfolio_file).split(',')
     share = {s: int(v) for s, v in zip(symbols, line[1:-3:3])}
     cash, total_value = float(line[-3]), float(line[-2])
 
-    return share, cash, total_value
+    return line[0], share, cash, total_value
 
 
 def get_portfolio_benchmark():
+    '''Get time series portfolio and benchmark'''
+
     data = pd.read_csv(_portfolio_file, sep=',', index_col='date', 
                        usecols=['date', 'total_value', 'benchmark'])
     return data
 
 
 def get_transaction_history():
+    '''Get transaction history, in reversed order of date'''
+
     with open(_trade_history_file, 'r') as f:
         f.readline()
-        return f.readlines()
+        data = f.readlines()
+
+    data = map(lambda line: line.strip().split(','), data)
+    data = sorted(data, key=lambda row: row[0], reverse=True)
+
+    return data
+
+
+def get_portfolio_data():
+    '''Read the entire portfolio file'''
+
+    with open(_portfolio_file, 'r') as f:
+        data = f.read()
+
+    return data
 
 
 def _validate_cash():
@@ -232,4 +257,4 @@ def trade():
 
 
 if __name__ == '__main__':
-    data = get_curr_holding()
+    data = get_transaction_history()

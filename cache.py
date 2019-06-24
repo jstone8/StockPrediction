@@ -2,18 +2,18 @@
 
 import logging
 import json
-import pandas as pd
 import time
 from datetime import datetime
 from typing import Sequence
 
+import pandas as pd
 import timeout_decorator
 from pymemcache.client.base import Client
 from empyrical import (simple_returns, cum_returns, aggregate_returns, max_drawdown, 
                        annual_return, annual_volatility, calmar_ratio, omega_ratio, 
                        sharpe_ratio, alpha_beta, tail_ratio, capture)
 
-from config import cache_url
+from config import cache_url, db_init
 from dataCollection import StockPrice
 from transaction import get_init_holding, get_curr_holding, get_portfolio_benchmark
 from transaction import get_transaction_history
@@ -111,14 +111,20 @@ class Cache(object):
 
 
     @classmethod
+    def flush_all(cls, delay=0, noreply=None):
+        logger.info('Flush all')
+        cls.client.flush_all(delay=delay, noreply=noreply)
+
+
+    @classmethod
     def set_share_cash(cls):
         date, share, cash, _ = get_curr_holding()
-
-        cls.client.set('share', share)
-        cls.client.set('cash', cash)
-
+        
         logger.info('Set share and cash from holdings at %s (today %s)', date, 
                     datetime.today().strftime('%Y-%m-%d'))
+
+        cls.set_cached('share', share)
+        cls.set_cached('cash', cash)
 
         return share, cash
 
@@ -137,11 +143,11 @@ class Cache(object):
         for symbol in symbols:
             prev, curr = collect_price(symbol)
             price[symbol] = (prev, curr)
-            cls.client.set(symbol, (prev, curr))
+            cls.set_cached(symbol, (prev, curr))
 
             if symbol != symbols[-1]: time.sleep(12)
 
-        cls.client.set('price', price)
+        cls.set_cached('price', price)
 
 
     @classmethod
@@ -149,7 +155,7 @@ class Cache(object):
         logger.info('Compute initial total value')
 
         _, _, init_value = get_init_holding()
-        cls.client.set('init_value', init_value)
+        cls.set_cached('init_value', init_value)
 
         return init_value
 
@@ -159,7 +165,7 @@ class Cache(object):
         logger.info('Get transaction history')
 
         transaction = get_transaction_history()
-        cls.client.set('transaction', transaction)
+        cls.set_cached('transaction', transaction)
 
         return transaction
 
@@ -172,9 +178,21 @@ class Cache(object):
         data.index = pd.to_datetime(data.index)
         stats = compute_stats(data['total_value'], data['benchmark'])
 
-        cls.client.set('stats', stats)
+        cls.set_cached('stats', stats)
 
         return stats
+
+
+def reset_all_cached():
+    logger.info('Reset memcached key/value pairs')
+
+    Cache.flush_all()
+
+    Cache.set_share_cash()
+    Cache.set_price(db_init['symbols'])
+    Cache.set_init_value()
+    Cache.set_transaction()
+    Cache.set_stats()
 
 
 if __name__ == '__main__':

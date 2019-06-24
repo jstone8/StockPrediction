@@ -1,22 +1,12 @@
 # -*- coding: utf-8 -*-
 
-import pytz
 import time
 from typing import Sequence, List, Tuple, Dict
 from collections import deque
 from datetime import datetime
 from functools import wraps
 
-
-def timed(func):
-    @wraps(func)
-    def wrapper(*args, **kwargs):
-        start = time.time()
-        result = func(*args, **kwargs)
-        end = time.time()
-        print('{} ran in {}s'.format(func.__name__, round(end - start, 2)))
-        return result
-    return wrapper
+import pytz
 
 
 def standardize_datetime(date_string: str, fmt: str, include_time: bool = True,

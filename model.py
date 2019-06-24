@@ -1,8 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import pandas as pd
 from typing import Sequence, List, Tuple, Dict
+
+import pandas as pd
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.metrics import accuracy_score
 

@@ -2,17 +2,17 @@
 
 import logging
 from typing import Sequence
+
 from flask import Flask, render_template
 
-from config import db_init, description
+from config import db_init, description, log_path
 from cache import Cache, collect_price
 from transaction import get_portfolio_data
 
 
 app = Flask(__name__)
 
-_log_folder = './log/'
-_log_filename = _log_folder + 'web.log'
+_log_filename = log_path['root_path'] + 'web.log'
 
 log_param = {
     'filename': _log_filename, 

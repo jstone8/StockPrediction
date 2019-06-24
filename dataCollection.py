@@ -1,10 +1,11 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import requests
 import time
 from datetime import datetime
 from typing import Sequence, List, Tuple, Dict
+
+import requests
 
 from database import Database
 from config import api_keys, db_init

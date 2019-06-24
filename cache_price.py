@@ -2,14 +2,11 @@
 
 import logging
 
-from config import log_path
-from dataCollection import collect_data
-from feature import update_feature
-from transaction import trade
-from cache import reset_all_cached
+from config import db_init, log_path
+from cache import Cache
 
 
-_log_filename = log_path['root_path'] + 'stock_prediction.log'
+_log_filename = log_path['root_path'] + 'cache_price.log'
 
 log_param = {
     'filename': _log_filename, 
@@ -26,13 +23,7 @@ logging.basicConfig(**log_param)
 def main():
     logging.info('Running main function')
 
-    try:
-        collect_data()
-        update_feature()
-        trade()
-        reset_all_cached()
-    except:
-        logging.exception('Critical error occurs')
+    Cache.set_price(db_init['symbols'])
 
     logging.info('Complete main function')
 

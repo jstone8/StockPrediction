@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 
 import logging
-import pandas as pd
 from typing import Sequence, List, Tuple, Dict
 
+import pandas as pd
 from vaderSentiment.vaderSentiment import SentimentIntensityAnalyzer
 
 from config import db_init, data_path

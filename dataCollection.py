@@ -168,7 +168,7 @@ class StockNews(object):
             'section' : 'general',
             'items'   : 50,
             'type'    : 'article',
-            'token'   : api_keys['stock_news_2'],
+            'token'   : api_keys['stock_news'],
         }
 
         if page: params['page'] = page
